@@ -1,7 +1,8 @@
 import math
 import numpy as np
+import tensorflow as tf
+from tensorflow_graphics.geometry import transformation
 from packing.core import Packing, Cell, Ellipsoid, Sphere
-from utils import affine_coordinate
 
 
 class Scenario(object):
@@ -10,26 +11,26 @@ class Scenario(object):
         build packings with fundamental cell
         """
         packing = Packing()
-        packing.dim = 3
 
-        packing.fixed_particles = True
-        packing.particle_type = 'sphere'
+        packing.particle_type = 'ellipsoid'
         packing.num_particles = 2
 
-        # add cell
-        packing.agent = Cell()
+        packing.fixed_particles = True
 
         # add particles
-        #packing.particles = [Ellipsoid() for i in range(packing.num_particles)]
-        #for i, ellipsoid in enumerate(packing.particles):
-        #    ellipsoid.name = 'ellipsoid %d' % i
-        #    ellipsoid.alpha = 1.
-        #    ellipsoid.beta = 0
-        
-        packing.particles = [Sphere() for i in range(packing.num_particles)]
-        for i, sphere in enumerate(packing.particles):
-            sphere.name = 'sphere %d' % i
-            sphere.radius = 1.
+        if packing.particle_type == 'ellipsoid':
+            packing.dim = 3
+            packing.particles = [Ellipsoid() for i in range(packing.num_particles)]
+            for i, ellipsoid in enumerate(packing.particles):
+                ellipsoid.name = 'ellipsoid %d' % i
+                ellipsoid.color = np.array([0.51,0.792,0.992])
+
+                ellipsoid.alpha = 1.
+                ellipsoid.beta = 0.
+
+        # add cell
+        packing.cell = Cell()
+        packing.cell.color = np.array([0.25,0.25,0.25])
 
         # make initial conditions
         self.reset_packing(packing)
@@ -39,7 +40,7 @@ class Scenario(object):
         """
         initial conditions of the packing
         """
-        packing.agent.color = np.array([0.25,0.25,0.25])             
+                   
     
         # set random initial states
         #basis = np.random.uniform(-1., 1., (packing.dim, packing.dim))
@@ -48,17 +49,17 @@ class Scenario(object):
         #packing.agent.state.basis = basis
 
         #packing.agent.state.lattice = np.eye(packing.dim)*packing.high_bound
-        packing.agent.state.lattice = np.array([[4., 0,  0],
+        packing.cell.state.lattice = np.array([[4., 0,  0],
                                                 [0,  2., 0],
                                                 [0,  0,  2.]])
 
         if packing.fixed_particles:
             p = packing.particles
             p[0].state.centroid = np.array([0., 0., 0.], dtype=np.float32)
-            p[0].state.orientation = np.array([0, 0, 0, 1], dtype=np.float32)
+            p[0].state.orientation = np.array([0, 0, 0], dtype=np.float32)
 
             p[1].state.centroid = np.array([2, 0., 0.], dtype=np.float32)
-            p[1].state.orientation = np.array([0, math.sqrt(0.5), 0, math.sqrt(0.5)], dtype=np.float32)
+            p[1].state.orientation = np.array([0, math.sqrt(0.5), 0], dtype=np.float32)
         else:
             is_valid = False
             for i, ellipsoid in enumerate(packing.particles):
@@ -83,15 +84,14 @@ class Scenario(object):
                 ellipsoid.state.centroid = centroid
                 ellipsoid.state.orientation = orientation
 
-        packing.agent.volume_elite = packing.agent.volume
-        packing.fraction = packing.volume_allp / packing.agent.volume
+        packing.cell.volume_elite = packing.cell.volume
 
     def reward(self, packing):
         # the reduction of cell volume between two steps
         if packing.cell_penalty > 0:
             reward = - math.exp(packing.cell_penalty)
         else:
-            agent = packing.agent
+            agent = packing.cell
             reward = (agent.volume_elite - agent.volume) / packing.volume_allp
             if reward > 0.: 
                 packing.agent.volume_elite = agent.volume
@@ -117,28 +117,20 @@ class Scenario(object):
     def observation(self, packing):
 
         particle_info = []
-        if packing.particle_type == 'ellipsoid':
-            for p in packing.particles:
-                r = p.state.centroid - packing.particles[0].state.centroid
-                local_c = affine_coordinate(r, packing.agent.state.lattice.T)
-                particle_info.append(np.concatenate([p.semi_axis] + [p.state.centroid] + [p.state.orientation] + [local_c]))
+        for p in packing.particles:
+            scaled_pos = p.scaled_centroid(packing.cell.state.lattice.T)
+            orientation = tf.convert_to_tensor(p.state.orientation, dtype=np.double)
+            quaternion = transformation.quaternion.from_euler(orientation)
+            if packing.particle_type == 'ellipsoid':
+                particle_info.append(np.concatenate([scaled_pos] + [quaternion] + [p.semi_axis]))
         
-        elif packing.particle_type == 'sphere':
-            for p in packing.particles:
-                r = p.state.centroid - packing.particles[0].state.centroid
-                local_c = affine_coordinate(r, packing.agent.state.lattice.T)
-                particle_info.append(np.concatenate([np.asarray([p.radius])] + [p.state.centroid] + [local_c]))
-        
-        #for bulk in packing.script_particles:
-        #    for particle in bulk:
-        #        particle_info.append(np.concatenate([particle.state.centroid] + [particle.state.orientation]))
-        #for particle in packing.script_particles:
-        #    particle_info.append(np.concatenate([particle.state.centroid] + [particle.state.orientation]))
+            elif packing.particle_type == 'sphere':
+                particle_info.append(np.concatenate([scaled_pos] + [np.asarray([p.radius])]))
 
         # cell basis
-        cell_info = (packing.agent.parallelepiped).tolist()
+        cell_info = (packing.cell.state.lattice).tolist()
         
-        return np.concatenate(particle_info + [cell_info] + [np.asarray([1.-packing.fraction])])
+        return np.concatenate(particle_info + cell_info)
 
     def done(self, packing):
         #if packing.cell_penalty > 0.:

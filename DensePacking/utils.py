@@ -3,6 +3,7 @@ import numpy as np
 from gym.spaces import Box, Discrete
 import tensorflow as tf
 from scipy import optimize
+from tensorflow_graphics.geometry import transformation
 
 def space_n_to_shape_n(space_n):
     """
@@ -54,6 +55,47 @@ class LinearSchedule(object):
         return self.initial_p + fraction * (self.final_p - self.initial_p)
 
 
+def relu(x):
+    return np.maximum(0, x)
+
+def Heaviside(x):
+    """
+    step function
+    """
+    if x > 0: return 1
+    else: return 0
+
+def abs_norm(x, Relu=False):
+    temp = relu(x) if Relu else x
+    return int(np.linalg.norm(temp, ord=1))
+
+def euler2qua(angle):
+    """
+    Convert euler angle to quaternion
+    """
+    a = tf.convert_to_tensor(angle, dtype=np.double)
+    qua = transformation.quaternion.from_euler(a)
+    return qua
+
+def data_scale(unscaled, from_range, to_range):
+    x = (unscaled - from_range[0]) / (from_range[1] - from_range[0])
+    x = x * (to_range[1] - to_range[0]) + to_range[0]
+    return x
+
+
+def surface_area(lattice):
+    """
+    Calculate the surface area for simulation cell
+    """
+    area = 0.
+    for i in range(3):
+        direction = [0, 1, 2]
+        direction.remove(i)
+
+        [d1, d2] = direction
+        area += 2.*np.linalg.norm(np.cross(lattice[d1], lattice[d2]))
+    return area
+
 def scr(filename, type, particles, lattice):
 
 	with open(filename, 'w') as f:
@@ -88,10 +130,15 @@ def scr(filename, type, particles, lattice):
             
                 f.write("zoom e ")   
 
-def Heaviside(x): 
-    # step function
-    if x>0: return 1
-    else: return 0
+
+def scaled_coordinate(position, frame):
+    """
+    frame = [v1 v2 v3] (Column-based Storage)
+    """
+    temp = np.linalg.pinv(frame)
+    new_pos = np.matmul(temp, position.T).T
+    return new_pos
+
 
 # overlap potential
 def overlap_fun(type, particle_a, particle_b):
@@ -100,7 +147,7 @@ def overlap_fun(type, particle_a, particle_b):
     """
     r_AB = particle_b.state.centroid - particle_a.state.centroid
 
-    if type == 'ellipsoid':
+    if type in ('ellipsoid', 'ellipse'):
         # maximum of PW function Fun_AB
         X_A = particle_a.char_mat
         X_B = particle_b.char_mat
@@ -109,10 +156,10 @@ def overlap_fun(type, particle_a, particle_b):
         f = Fun_AB(t_c, X_A, X_B, r_AB)
         overlap_p = 0.5 * Heaviside(-f) * f**2
 
-    elif type =='sphere':
+    elif type in ('sphere', 'disk'):
         r = np.linalg.norm(r_AB)
         sigma = particle_a.radius + particle_b.radius
-        x = 1. - r/sigma
+        x = 1. - r / sigma
         overlap_p = 0.5 * Heaviside(x) * x**2
 
     return overlap_p
@@ -120,9 +167,8 @@ def overlap_fun(type, particle_a, particle_b):
 def Fun_AB(t, XA, XB, r):
     """
     Calculation of Perram-Wertheim function:
-    # F_AB = t(1-t)r^T Y^{-1} r, where Y = t*XB^{-1}+(1-t)*XA^{-1}
+    F_AB = t(1-t)r^T Y^{-1} r - 1, where Y = t*XB^{-1}+(1-t)*XA^{-1}
     """
-    # F_AB = t(1-t)r^T Y^{-1} r
     Y = t*np.linalg.pinv(XB) + (1.-t)*np.linalg.pinv(XA)
     Y = np.linalg.pinv(Y)
 
@@ -132,10 +178,26 @@ def Fun_AB(t, XA, XB, r):
     assert len(F_AB) == 1
     return F_AB[0][0]
 
-def affine_coordinate(vec, lattice):
+
+def output_xyz(filename, packing):
     """
-    coordinate transformation
+    For visulaization in ovito
     """
-    lat = np.linalg.pinv(lattice)
-    new_vec = np.matmul(lat, vec.reshape(-1,1))
-    return new_vec.reshape(1,-1)[0]
+    centroid = [particle.centroid for particle in packing.visable_particles]
+    quaternion = [euler2qua(particle.orientation) for particle in packing.visable_particles]
+    semi_axis = [particle.semi_axis for particle in packing.visable_particles]
+    color = [particle.color for particle in packing.visable_particles]
+
+    # colors = self.color_palette(labels, probabilities)
+    n = len(packing.visable_particles)
+    with open(filename, 'w') as f:
+        # The keys should be strings
+        f.write(str(n) + '\n')
+        f.write('Lattice="' + ' '.join([str(vector) for vector in packing.cell.lattice.flat]) + '" ')
+        # f.write('Origin="' + ' '.join(str(index) for index in packing.cell.origin) + '" ')
+        f.write('Properties=pos:R:3:orientation:R:4:aspherical_shape:R:3:color:R:3 \n')
+
+        if (packing.particle_type == 'ellipsoid'):
+            np.savetxt(f, np.column_stack([centroid, quaternion, semi_axis, color]))
+
+

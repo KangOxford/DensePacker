@@ -1,11 +1,13 @@
+from re import T
 import numpy as np
-import tensorflow as tf
 
 import gym
 from gym import spaces
 from gym.utils import seeding
+from sklearn.preprocessing import minmax_scale 
 
 from packing.scenario import Scenario
+from utils import data_scale
 
 
 scenario = Scenario()
@@ -29,7 +31,7 @@ class CellEnv(gym.Env):
         packing: multi-particles
         """
         self.packing = packing
-        self.agent = self.packing.agent
+        self.agent = self.packing.cell
         self.dim = self.packing.dim
 
         # scenario callbacks
@@ -48,10 +50,8 @@ class CellEnv(gym.Env):
             dim = self.dim*(self.dim+1)/2
             self.action_space = spaces.Box(low=-1., high=1., shape=(6, ), dtype=np.float32)
         elif self.method == "rotation":
-            
-            dim = self.dim*(self.dim+1)//2 + self.dim
-            # origin unit cell (6 parameters) and Euler angles (or quaternion?)
-            self.action_space = spaces.Box(low=-1., high=1., shape=(9, ), dtype=np.float32)
+            # euler angles + cell length
+            self.action_space = spaces.Box(low=-1., high=1., shape=(4*self.dim, ), dtype=np.float32)
 
         # observation space
         obs_dim = len(observation_callback(self.packing))
@@ -80,25 +80,14 @@ class CellEnv(gym.Env):
             self.agent.action.strain = 1e-1 * strain
             
         elif self.method == "rotation":
-            assert len(action) == 9
-            # rescale to [0, 1]
-            action = 0.5*(action+1.) 
+            assert len(action) == 12
 
-            base = np.zeros((self.dim, self.dim))
-            id = -1
-            for i in range(self.dim):
-                for j in range(self.dim):
-                    if i>j: continue
-                    id += 1   
-                    base[i][j] = action[id]
+            action = action.reshape(3, -1)
 
-            base[0][1] *= 0.5*base[0][0]
-            base[0][2] *= 0.5*(base[0][0] + base[0][1])
-            base[1][2] *= 0.5*base[1][1]
-
-            self.agent.action.base = self.packing.high_bound*base.T
-            self.agent.action.angle = action[6:9]*2.*np.pi
-            self.agent.action.angle[1] /= 2.
+            self.agent.action.angle = data_scale(action[:, 0:3], from_range=(-1, 1), to_range=(0., 2.*np.pi))
+            self.agent.action.angle[:, 1] /= 2.
+            self.agent.action.length = data_scale(action[:, 3], from_range=(-1, 1), to_range=self.packing.cell_bound)
+            
 
         # advance cell state in a packing
         self.packing.cell_step(self.method)

@@ -53,22 +53,20 @@ class DDPGAgent(object):
         # path_actor = "./models/actor/actor" + date + ".h5"
         # path_critic = "./models/critic/actor" + date + ".h5"
 
-        
-
     def get_action(self, state, step):
         """
         Return the best action in the previous state, according to the model
         in training. Noise added for exploration
         """
-        
-        if(step > self.rand_steps):
-            noise = self.noise()
-            state = state.reshape(self.n_states, 1).T
-            action = self.actor.model.predict(state)[0]
-            action_prev = action + noise
-        else:
+        #if(step > self.rand_steps):
+        noise = self.noise()
+        state = state.reshape(self.n_states, 1).T
+        action = self.actor.model.predict(state)[0]
+        # print(action)
+        action_prev = action + noise
+        #else:
             # random actions for the first episode to explore the action space
-            action_prev = np.random.uniform(self.lower_bound, self.upper_bound, self.n_actions)
+            #action_prev = np.random.uniform(self.lower_bound, self.upper_bound, self.n_actions)
 
         #clip the resulting action with the bounds
         action_prev = np.clip(action_prev, self.lower_bound, self.upper_bound)

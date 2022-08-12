@@ -83,8 +83,8 @@ def main():
     action_boundaries = [agent_env.action_space.low, agent_env.action_space.high]
 
     # Create agent and multi-particles
-    agent = DDPGAgent(state_dim, action_dim, action_boundaries, actor_lr = 1e-4,
-                     critic_lr = 1e-3, batch_size = 128, noise = 'ou', gamma = 0.99, rand_steps = 2,
+    agent = DDPGAgent(state_dim, action_dim, action_boundaries, actor_lr = 1e-5,
+                     critic_lr = 1e-4, batch_size = 128, noise = 'ou', gamma = 0.99, rand_steps = 2,
                      buffer_size = int(1e6), tau = 0.001)
 
     np.random.seed(0)
@@ -106,6 +106,7 @@ def main():
         while not terminal:
             #predict new action
             action = agent.get_action(state, episode)
+            #print(action)
             #perform the transition according to the predicted action
             state_new, reward, terminal, info = agent_env.step(action)
             #store the transaction in the memory
@@ -120,17 +121,17 @@ def main():
         #if packing.cell_penalty == 0. and packing.fraction > 0.5:
             if i == 500:
                 filename = f'{packing.fraction:.3f}.scr'
-                scr(filename, 'sphere', packing.visable_particles, packing.agent.state.lattice)
+                scr(filename, 'sphere', packing.visable_particles, packing.cell.state.lattice)
         
         if i == 500:
                 filename = f'{packing.fraction:.3f}.scr'
-                scr(filename, 'sphere', packing.visable_particles, packing.agent.state.lattice)
+                scr(filename, 'sphere', packing.visable_particles, packing.cell.state.lattice)
 
 
         PD.append(packing.fraction)
         Penalty.append(packing.cell_penalty)
         print("Iteration {:d} --> step {:d} score {:.2f}. packing density {:.4f}".format( i, step, score, packing.fraction))
-        print("penalty {:2f} elite_volume {:2f}".format(packing.cell_penalty, packing.agent.volume_elite))
+        print("penalty {:2f} elite_volume {:2f}".format(packing.cell_penalty, packing.cell.volume_elite))
         episode += 1
 
     plt.figure(figsize=[8,6])
