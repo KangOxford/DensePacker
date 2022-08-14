@@ -1,6 +1,6 @@
 # import gym
 # from stable_baselines3.common.vec_env import DummyVecEnv
-# env_id = 'DensePacking-v1'
+# env_id = 'Cell-v0'
 # env = DummyVecEnv([lambda: gym.make(env_id)])
 
 
