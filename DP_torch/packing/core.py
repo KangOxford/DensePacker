@@ -104,6 +104,8 @@ class Sphere(Particle):
 # specific particles
 class Ellipsoid(Particle):
     def __init__(self):
+        super().__init__()
+
         self.dim = 3
 
         # shape parameters (alpha: alpha^beta : 1)
@@ -112,6 +114,8 @@ class Ellipsoid(Particle):
         
         # script behavior to execute
         self.action_callback = None
+
+        # self.state = ParticleState()
     
     @property
     def semi_axis(self):
