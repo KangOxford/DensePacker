@@ -11,6 +11,7 @@ conda activate dp
 # pip install pytorch3d
 # pip install tk
 # pip install scipy
+# pip install stable-baselines3
 
 
 
