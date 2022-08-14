@@ -28,8 +28,8 @@ class Transform():
         """
         Convert rotations given as Euler angles in radians to rotation matrices.
         """
-        x = torch.as_tensor(angle, dtype=np.double)
-        mat = transforms.euler_angles_to_matrix(x)
+        x = torch.as_tensor(angle, dtype=torch.double)
+        mat = transforms.euler_angles_to_matrix(x, "ZYX")
         return mat
     
     def euler2qua(self, angle):
@@ -150,7 +150,7 @@ def output_xyz(filename, packing):
     For visulaization in ovito
     """
     centroid = [particle.centroid for particle in packing.visable_particles]
-    quaternion = [Transform.euler2qua(particle.orientation) for particle in packing.visable_particles]
+    quaternion = [Transform().euler2qua(particle.orientation) for particle in packing.visable_particles]
     semi_axis = [particle.semi_axis for particle in packing.visable_particles]
     color = [particle.color for particle in packing.visable_particles]
 
