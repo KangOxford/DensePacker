@@ -146,7 +146,7 @@ class Ellipsoid(Particle):
         shape and orientation of the ellipsoid
         """
         # note that: rot_mat = Rz*Ry*Rx = Q^T
-        rot_mat = Transform.euler2mat(self.state.orientation)
+        rot_mat = Transform().euler2mat(self.state.orientation)
         
         # O: a diagonal matrix containing the major semi-axes
         O = np.diag(self.semi_axis)
@@ -493,7 +493,7 @@ class Packing(object):
             self.agent.action.num += 1
 
         elif method == "rotation":
-            mat = Transform.euler2mat(self.cell.action.angle)
+            mat = Transform().euler2mat(self.cell.action.angle)
             self.cell.state.lattice = np.matmul(mat, self.cell.state.lattice)
             self.cell.set_length(self.cell.action.length)
 
