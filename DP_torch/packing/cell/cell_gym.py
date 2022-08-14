@@ -55,7 +55,7 @@ class CellEnv(gym.Env):
         
         self._set_action(action)
         # advance cell state in a packing
-        self.packing.cell_step(self.method)
+        self.packing.cell_step(self.mode)
 
         # reward and observation
         obs = self.observation_callback(self.packing)
