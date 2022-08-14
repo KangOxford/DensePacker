@@ -110,7 +110,7 @@ class Scenario(object):
         particle_info = []
         for p in packing.particles:
             scaled_pos = p.scaled_centroid(packing.cell.state.lattice.T)
-            quaternion = Transform.euler2qua(p.state.orientation)
+            quaternion = Transform.euler2qua(angle = p.state.orientation)
             if packing.particle_type == 'ellipsoid':
                 particle_info.append(np.concatenate([scaled_pos] + [quaternion] + [p.semi_axis]))
         
