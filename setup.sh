@@ -1,8 +1,12 @@
+# conda init bash
+
 export PATH=/workspace/anaconda3/bin:$PATH
 export PATH=/workspace/DensePacking/DP_torch:$PATH
-export PYTHON_PATH=/workspace/DensePacking/DP_torch:$PYTHON_PATH
-source ~/.bash_profile
-source ~/.bashrc
+export PYTHONPATH=/workspace/DensePacking/DP_torch:$PYTHONPATH
+
+# source ~/.bash_profile
+# source ~/.bashrc
+
 
 conda activate dp
 ipython
