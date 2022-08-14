@@ -13,13 +13,6 @@ class Particle(object):
         # spatial dimensions
         self.dim = None
 
-        # state: coordinate and euler angle
-        self.state = ParticleState()
-
-        # control action range
-        self.tran_low = np.array([0., 0., 0.])
-        self.tran_high = np.array([0.1, 0.1, 0.1])
-
         # color
         self.color = None
 
@@ -109,6 +102,13 @@ class Ellipsoid(Particle):
         # shape parameters (alpha: alpha^beta : 1)
         self.alpha = None
         self.beta = None
+	
+	# state: coordinate and euler angle
+        self.state = ParticleState()
+	
+	# control action range
+        self.tran_low = np.array([0., 0., 0.])
+        self.tran_high = np.array([0.1, 0.1, 0.1])
         
         # script behavior to execute
         self.action_callback = None
