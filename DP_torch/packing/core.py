@@ -1,5 +1,3 @@
-from tkinter.messagebox import NO
-import torch
 import numpy as np
 
 import math
@@ -372,7 +370,7 @@ class Packing(object):
 
         # need further calculation
         image_list, extended_list = self.build_list()
-	
+
         for a, particle_a in enumerate(self.particles):
             for b, particle_b in enumerate(self.particles):
                 if (b == a):
@@ -475,27 +473,25 @@ class Packing(object):
 
         # establish the equivalent set of images in the regular coordinate frame
         image_list = []
-        num_layer = 0
         for i in range(-num_image[0], num_image[0]+1):
             for j in range(-num_image[1], num_image[1]+1):
                 for k in range(-num_image[2], num_image[2]+1): 
                     if (i==j==k==0): continue
 
-                    # reduced self-image list
                     index = [i, j, k]
                     vec = np.matmul(index, self.cell.state.lattice)
+                    # reduced self-image list
                     if np.dot(vec, normal)<0. or np.linalg.norm(vec)>self.max_od: continue
-                    image_list.append(index) 
-                    
-                    # calculate max(i+j+k), and i,j,k should be non-negative simultaneously
-                    num_layer = int(max(num_layer, abs_norm(index, Relu=True)))      
+                    image_list.append(index)     
 
+        index_bound = np.max(image_list + [[0, 0, 0]], axis=0).tolist()
         # add 1 layer of images in the positive vi directions to the set
         extended_list = image_list.copy()
-        # 1 <= i+j+k <= layer+6
-        for i in range(num_layer+7):
-            for j in range(num_layer+7-i):
-                for k in range(relu(1-i-j), num_layer+7-i-j):
+        for i in range(index_bound[0]+2):
+            for j in range(index_bound[1]+2):
+                for k in range(index_bound[2]+2):
+                    if (i==j==k==0): continue
+
                     index = [i, j, k]
                     if (index not in image_list): extended_list.append(index)
 
