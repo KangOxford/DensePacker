@@ -63,7 +63,6 @@ class CellEnv(gym.Env):
         done = self.done_callback(self.packing)
 
         info = {}
-        info.update(self.cost())
 
         return obs, reward, done, info
 
@@ -76,6 +75,9 @@ class CellEnv(gym.Env):
         # record observation
         obs = self.observation_callback(self.packing)
         return obs
+
+    def render(self):
+        print("overlap_potential {:2f} packing_fraction {:2f}".format(self.packing.overlap_potential, self.packing.fraction))
 
     def _set_action(self, action):
 

@@ -13,6 +13,9 @@ class Particle(object):
         # spatial dimensions
         self.dim = None
 
+        # state: coordinate and euler angle
+        self.state = ParticleState()
+
         # color
         self.color = None
 
@@ -105,17 +108,12 @@ class Ellipsoid(Particle):
         self.alpha = None
         self.beta = None
 	
-	# state: coordinate and euler angle
-        self.state = ParticleState()
-	
-	# control action range
+        # control action range
         self.tran_low = np.array([0., 0., 0.])
         self.tran_high = np.array([0.1, 0.1, 0.1])
         
         # script behavior to execute
         self.action_callback = None
-
-        # self.state = ParticleState()
     
     @property
     def semi_axis(self):
@@ -360,11 +358,20 @@ class Packing(object):
     @property
     def cell_penalty(self):
         """
-        Calculate the external part of overlap potential for all overlaping pairs
+        Penalty function for constraint violation.
         """
-        image_list, extended_list = self.build_list()
+        penalty = 0.
+        # obvious overlap: within the range of (1, 2)
+        flag = False
+        for i in range(self.dim):
+            norm = np.linalg.norm(self.cell.state.lattice[i])
+            if (norm < self.cell_bound[0]):
+                flag = True
+                penalty = max(penalty, 2. - norm/self.cell_bound[0])
+        if flag: return penalty
 
-        # calculate penalty
+        # need further calculation
+        image_list, extended_list = self.build_list()
         penalty = 0.
         for a, particle_a in enumerate(self.particles):
             for b, particle_b in enumerate(self.particles):
@@ -387,7 +394,40 @@ class Packing(object):
                         if distance < self.max_od:
                             penalty += overlap_fun(self.particle_type, pa_new, particle_i)
 
-        return penalty
+        return penalty / 20.
+
+    @property
+    def overlap_potential(self):
+        """
+        Calculate the external part of overlap potential for all overlaping pairs
+        """
+        image_list, extended_list = self.build_list()
+
+        # calculate penalty
+        potential = 0.
+        for a, particle_a in enumerate(self.particles):
+            for b, particle_b in enumerate(self.particles):
+                if (b == a):
+                    # external part I (with one's own periodic images)
+                    for index in image_list:
+                        vector = np.matmul(index, self.cell.state.lattice)
+                        particle_i = particle_b.periodic_image(vector)
+                        potential += overlap_fun(self.particle_type, particle_a, particle_i)
+                else:
+                    # external part II (with other particles’ periodic images)
+                    # make sure that particle_b located in the origin
+                    pa_new = particle_a.periodic_image(-particle_b.state.centroid)
+                    pa_new.periodic_check(self.cell.state.lattice.T)
+                    
+                    for index in extended_list:
+                        vector = np.matmul(index, self.cell.state.lattice)
+                        particle_i = particle_b.periodic_image(vector-particle_b.state.centroid)
+                        distance = np.linalg.norm(particle_i.state.centroid - pa_new.state.centroid)
+                        if distance < self.max_od:
+                            potential += overlap_fun(self.particle_type, pa_new, particle_i)
+
+        return potential
+
 
     @property  
     def is_overlap(self):
@@ -475,7 +515,7 @@ class Packing(object):
         
         self.cell.origin = origin / self.num_particles
 
-    def cell_step(self, method):
+    def cell_step(self, mode):
         """
         Update cell in the packing.
         """
@@ -484,7 +524,7 @@ class Packing(object):
         self.fraction_prev = self.fraction
 
         # set action (small deformation)
-        if method == "strain_tensor":
+        if mode == "strain_tensor":
             deformation = np.multiply(self.agent.state.base, self.agent.action.strain)
             self.agent.state.base += deformation
             self.agent.state.length = [np.linalg.norm(x) for x in self.agent.state.base]
@@ -492,13 +532,13 @@ class Packing(object):
             
             self.agent.action.num += 1
 
-        elif method == "rotation":
-            mat = Transform().euler2mat(self.cell.action.angle)
-            self.cell.state.lattice = np.matmul(mat, self.cell.state.lattice)
+        elif mode == "rotation":
+            for i in range(self.dim):
+                mat = Transform().euler2mat(self.cell.action.angle[i])
+                self.cell.state.lattice[i] = np.matmul(mat, self.cell.state.lattice)[i]
             self.cell.set_length(self.cell.action.length)
 
         self.cell.lattice_reduction()
-        # print(self.cell.state.lattice)
         for particle in self.particles:
             particle.periodic_check(self.cell.state.lattice.T)
 
