@@ -1,9 +1,10 @@
 # DensePacking
 ### Reinforcement Learning Implementation
 
-* remember to run the lab in the dpenvironment via the command `conda activate dp`
-* or just `bash setup.sh` each time on openning the gitpod ssh link.
-* it should look like this `(dp) gitpod /workspace/DensePacking/DP_torch (main) $ `
+<!--* remember to run the lab in the dpenvironment via the command `conda activate dp`-->
+* `bash setup-v2.sh` each time on openning the gitpod ssh link.
+* use the command `ssh -L 16006:127.0.0.1:6006 'kangoxford-densepacking-yky9rdbuiid@kangoxford-densepacking-yky9rdbuiid.ssh.ws-eu61.gitpod.io'` if you want to run in vscode
+<!--* it should look like this `(dp) gitpod /workspace/DensePacking/DP_torch (main) $ `-->
 
 
 # Basic definition
