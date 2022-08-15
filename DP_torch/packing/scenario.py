@@ -66,22 +66,20 @@ class Scenario(object):
             
                     if id in [0, 3, 4]: variable[id] = 2.*variable[id] - 1.
                     lattice[i][j] = variable[id] * packing.cell_bound[1]
-
             packing.cell.state.lattice = lattice
         else:
-            packing.cell.state.lattice = np.array([[4., 0,  0], [0,  2., 0], [0,  0,  2.]])
+            packing.cell.state.lattice = np.array([[2.1, 0,  0], [0,  2., 0], [0,  0,  2.]])
 
         packing.cell.lattice_reduction()
         for particle in packing.particles:
             particle.periodic_check(packing.cell.state.lattice.T)
-
         packing.cell.volume_elite = packing.cell.volume
 
     def reward(self, packing):
-        # the reduction of cell volume between two steps
-        if packing.cell_penalty > 0:
-            reward = - math.exp(packing.cell_penalty)
+        penalty = packing.cell_penalty
+        if penalty > 0: reward = - math.exp(penalty)
         else:
+            # the reduction of cell volume between two steps
             agent = packing.cell
             reward = (agent.volume_elite - agent.volume) / packing.volume_allp
             if reward > 0.: 

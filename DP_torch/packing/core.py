@@ -50,6 +50,7 @@ class Particle(object):
 	
         self.state.centroid = np.matmul(lattice, scaled_pos.T).T
 
+
 class ParticleState(object):
     """
     Base state of all particles with (absolute) coordinate and euler angle.
@@ -60,6 +61,7 @@ class ParticleState(object):
         # (fai 0-2*PI; cita 0-PI; pesai 0-2*PI)
         self.orientation = None
 
+
 class ParticleAction(object):
     def __init__(self):
         # translation & rotation
@@ -69,8 +71,9 @@ class ParticleAction(object):
 
 class Sphere(Particle):
     def __init__(self):
+        super().__init__()
         self.dim = 3
-
+        
         # shape parameters
         self.radius = None
         
@@ -99,7 +102,6 @@ class Sphere(Particle):
 class Ellipsoid(Particle):
     def __init__(self):
         super().__init__()
-
         self.dim = 3
 
         # shape parameters (alpha: alpha^beta : 1)
@@ -354,47 +356,6 @@ class Packing(object):
         return self.particles + copy_particles
 
     @property
-    def cell_penalty(self):
-        """
-        Penalty function for constraint violation.
-        """
-        penalty = 0.
-        # obvious overlap: within the range of (1, 2)
-        flag = False
-        for i in range(self.dim):
-            norm = np.linalg.norm(self.cell.state.lattice[i])
-            if (norm < self.cell_bound[0]):
-                flag = True
-                penalty = max(penalty, 2. - norm/self.cell_bound[0])
-        if flag: return penalty
-
-        # need further calculation
-        image_list, extended_list = self.build_list()
-
-        for a, particle_a in enumerate(self.particles):
-            for b, particle_b in enumerate(self.particles):
-                if (b == a):
-                    # external part I (with one's own periodic images)
-                    for index in image_list:
-                        vector = np.matmul(index, self.cell.state.lattice)
-                        particle_i = particle_b.periodic_image(vector)
-                        penalty += overlap_fun(self.particle_type, particle_a, particle_i)
-                else:
-                    # external part II (with other particles’ periodic images)
-                    # make sure that particle_b located in the origin
-                    pa_new = particle_a.periodic_image(-particle_b.state.centroid)
-                    pa_new.periodic_check(self.cell.state.lattice.T)
-                    
-                    for index in extended_list:
-                        vector = np.matmul(index, self.cell.state.lattice)
-                        particle_i = particle_b.periodic_image(vector-particle_b.state.centroid)
-                        distance = np.linalg.norm(particle_i.state.centroid - pa_new.state.centroid)
-                        if distance < self.max_od:
-                            penalty += overlap_fun(self.particle_type, pa_new, particle_i)
-
-        return penalty / 20.
-
-    @property
     def overlap_potential(self):
         """
         Calculate the external part of overlap potential for all overlaping pairs
@@ -405,6 +366,9 @@ class Packing(object):
         potential = 0.
         for a, particle_a in enumerate(self.particles):
             for b, particle_b in enumerate(self.particles):
+                # internal part (in the unit cell)
+                if (b > a): potential += overlap_fun(self.particle_type, particle_a, particle_b)
+
                 if (b == a):
                     # external part I (with one's own periodic images)
                     for index in image_list:
@@ -426,9 +390,8 @@ class Packing(object):
 
         return potential
 
-
     @property  
-    def is_overlap(self):
+    def is_overlap(self) -> bool:
         for i in range(3):
             if ((np.linalg.norm(self.cell.state.lattice[i])-self.cell_bound[0]) < -1e-10): return True
 
@@ -464,6 +427,21 @@ class Packing(object):
 
         return False
 
+    @property
+    def cell_penalty(self):
+        """
+        Penalty function for constraint violation.
+        """
+        # obvious overlap: within the range of (1, 2)
+        if (self.fraction > 1.):
+            penalty = 1. + (1. - 1./self.fraction)**2
+        else:
+            # print(self.upbound_image)
+            # need further calculation
+            penalty = self.overlap_potential / 10.
+
+        return penalty
+
     def build_list(self):
         """
         Construct the image list in the scaled coordinate frame
@@ -485,6 +463,7 @@ class Packing(object):
                     image_list.append(index)     
 
         index_bound = np.max(image_list + [[0, 0, 0]], axis=0).tolist()
+
         # add 1 layer of images in the positive vi directions to the set
         extended_list = image_list.copy()
         for i in range(index_bound[0]+2):
@@ -496,7 +475,7 @@ class Packing(object):
                     if (index not in image_list): extended_list.append(index)
 
         # concentric approach
-        if (len(image_list)>0): image_list.sort(key=abs_norm)
+        if (len(image_list) > 0): image_list.sort(key=abs_norm)
         extended_list.sort(key=abs_norm)
 
         return image_list, extended_list
