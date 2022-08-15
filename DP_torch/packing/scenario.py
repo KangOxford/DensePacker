@@ -85,7 +85,7 @@ class Scenario(object):
             agent = packing.cell
             reward = (agent.volume_elite - agent.volume) / packing.volume_allp
             if reward > 0.: 
-                packing.agent.volume_elite = agent.volume
+                packing.cell.volume_elite = agent.volume
                 #reward += 1.
 
         return reward
