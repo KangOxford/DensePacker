@@ -15,6 +15,7 @@ export PYTHONPATH=/workspace/DensePacking/DP_torch:$PYTHONPATH
 conda activate dp
 ipython
 
+##python version == 3.7.3
 # pip install torch==1.11.0
 # pip install ipython
 # pip install keras
@@ -23,20 +24,3 @@ ipython
 # pip install tk
 # pip install scipy
 # pip install stable-baselines3
-
-# ======================================================= #
-# used for non dp python env
-
-
-##python version == 3.7.3
-pip install torch==1.11.0
-pip install keras
-pip install gym
-pip install pytorch3d
-pip install tk
-pip install scipy
-pip install stable-baselines3
-
-export PYTHONPATH=/workspace/DensePacking/DP_torch:$PYTHONPATH
-
-
