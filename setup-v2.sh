@@ -17,4 +17,4 @@ export PYTHONPATH=/workspace/DensePacking/DP_torch:$PYTHONPATH
 
 
 # python -m cProfile -s cumulative /workspace/DensePacking/DP_torch/train_cell_gym.py > analysis_train_cell_gym.txt
-# tensorboard --logdir /workspace/DensePacking/ppo_densepacking_tensorboard-v2/
+# tensorboard --logdir /workspace/DensePacking/ppo_densepacking_tensorboard-v5/
