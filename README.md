@@ -19,7 +19,7 @@
 * It is important to introduce the lattice packing composed of nonoverlapping identical particles centered at the points of a lattice \Lambda with a common orientation, which, for an ordered packing, possibly corresponds to the maximally dense packings.
 
 # Non-spherical particles
-# Ellipsoid
+### Ellipsoid
 * In 2004, Donev et al. [30] proposed a simple monoclinic crystal with two ellipsoids of different orientations per unit cell (SM2).
 ![图片2](https://user-images.githubusercontent.com/72123149/184534832-a22fdb2a-6d26-4572-acbf-9d685ac315bd.png)
 
@@ -36,4 +36,12 @@
 length and orientation.
 * We do not make any assumptions concerning the orientation of the box here. A commonly used choice for variable-box-shape simulations is to have one of the box vectors along the x axis, another vector in the positive part of
 the xy-plane, and the third in the z > 0 half space.
+
+# Gym environment
+### Cell_gym
+  We firstly concentrate on a subproblem in which particles are fixed (both centroid and orientation) with adaptive cell. 
+* Objective function: the volume of cell (should be minized)
+* Action space (12 variables): three sets of euler angle (for the rotation of cell vectors) + vector lengths
+* Observation space: particle info (scaled coordinate + quaternion + aspherical shape) + three cell vectors
+* (!!!) Reward function: The reduction in the volume of cell could possibly arisen from increasing overlap in the packing.
 
