@@ -372,7 +372,7 @@ class Packing(object):
 
         # need further calculation
         image_list, extended_list = self.build_list()
-        penalty = 0.
+	
         for a, particle_a in enumerate(self.particles):
             for b, particle_b in enumerate(self.particles):
                 if (b == a):
