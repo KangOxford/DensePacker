@@ -68,7 +68,7 @@ class Scenario(object):
                     lattice[i][j] = variable[id] * packing.cell_bound[1]
             packing.cell.state.lattice = lattice
         else:
-            packing.cell.state.lattice = np.array([[2.1, 0,  0], [0,  2., 0], [0,  0,  2.]])
+            packing.cell.state.lattice = np.array([[4., 0,  0], [0,  2., 0], [0,  0,  2.]])
 
         packing.cell.lattice_reduction()
         for particle in packing.particles:
