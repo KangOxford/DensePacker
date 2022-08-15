@@ -11,6 +11,7 @@ pip install tk
 pip install scipy
 pip install stable-baselines3
 pip install ipython
+pip install tensorboard
 
 export PYTHONPATH=/workspace/DensePacking/DP_torch:$PYTHONPATH
 

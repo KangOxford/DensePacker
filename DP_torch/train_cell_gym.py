@@ -13,9 +13,13 @@ from packing.cell.cell_gym import CellEnv
 scenario = Scenario()
 packing = scenario.build_packing()
 # Create environment
+
 env = CellEnv(packing, scenario.reset_packing, scenario.reward, scenario.observation, scenario.done)
-model = PPO("MlpPolicy", env, verbose=1)
-model.learn(total_timesteps=int(1e2))
+model = PPO("MlpPolicy", env, verbose=1, tensorboard_log="./ppo_densepacking_tensorboard-v1/")
+model.learn(total_timesteps=int(1e3), tb_log_name="first_run")
+model.learn(total_timesteps=int(1e3), tb_log_name="second_run",reset_num_timesteps=False)
+model.learn(total_timesteps=int(1e3), tb_log_name="third_run", reset_num_timesteps=False)
+model.learn(total_timesteps=int(1e3), tb_log_name="forth_run", reset_num_timesteps=False)
 model.save("ppo_densepacking")
 
 obs = env.reset()
