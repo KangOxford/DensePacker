@@ -531,7 +531,7 @@ class Packing(object):
         elif mode == "rotation":
             for i in range(self.dim):
                 mat = Transform().euler2mat(self.cell.action.angle[i])
-                self.cell.state.lattice[i] = np.matmul(mat, self.cell.state.lattice)[i]
+                self.cell.state.lattice[i] = np.matmul(mat, self.cell.state.lattice[i])
             self.cell.set_length(self.cell.action.length)
 
         self.cell.lattice_reduction()
