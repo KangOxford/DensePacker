@@ -3,23 +3,23 @@
 # env_id = 'Cell-v0'
 # env = DummyVecEnv([lambda: gym.make(env_id)])
 
+# import sys
+# with open('/workspace/DensePacking/analysis_train_cell_gym.txt', 'w') as sys.stdout:
 
 from stable_baselines3 import PPO
-
 from packing.scenario import Scenario
 from packing.cell.cell_gym import CellEnv
-
 
 scenario = Scenario()
 packing = scenario.build_packing()
 # Create environment
 env = CellEnv(packing, scenario.reset_packing, scenario.reward, scenario.observation, scenario.done)
 model = PPO("MlpPolicy", env, verbose=1)
-model.learn(total_timesteps=25000)
+model.learn(total_timesteps=int(1e2))
 model.save("ppo_densepacking")
 
 obs = env.reset()
-while True:
+for i in range(int(1e2)):
     action, _states = model.predict(obs)
     obs, rewards, dones, info = env.step(action)
     env.render()
