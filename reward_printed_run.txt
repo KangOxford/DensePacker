@@ -10340,3 +10340,203 @@ Logging to ./ppo_densepacking_tensorboard-v6/reward_printed_run_1
 |    std                  | 0.991      |
 |    value_loss           | 4.97e+03   |
 ----------------------------------------
+>>>Penalty: -2.189387599780369
+overlap_potential 0.904747 packing_fraction 0.471324
+>>>Penalty: -2.0488077240803126
+overlap_potential 0.241108 packing_fraction 0.559518
+>>>Penalty: -2.0081771850968244
+overlap_potential 0.040803 packing_fraction 0.188733
+>>>Penalty: -2.1056769654662997
+overlap_potential 0.514898 packing_fraction 0.918832
+>>>Penalty: -2.3105796276449166
+overlap_potential 1.443512 packing_fraction 0.740525
+>>>Penalty: -5.720635152151866
+overlap_potential 1.388919 packing_fraction 1.291460
+>>>Penalty: -12.215639919431904
+overlap_potential 11.563817 packing_fraction 9.976160
+>>>Penalty: -2.1773868674828947
+overlap_potential 0.849783 packing_fraction 0.730152
+>>>Penalty: -9.029371491742275
+overlap_potential 4.356223 packing_fraction 3.475540
+>>>Penalty: -2.1668371947084117
+overlap_potential 0.801214 packing_fraction 0.297845
+>>>Penalty: -2.18603933906997
+overlap_potential 0.889442 packing_fraction 0.265929
+>>>Penalty: -2.2034644596706676
+overlap_potential 0.968837 packing_fraction 0.313018
+>>>Penalty: -2.0455361781835024
+overlap_potential 0.225128 packing_fraction 0.437485
+>>>Penalty: -6.412274291527714
+overlap_potential 1.678764 packing_fraction 1.684307
+>>>Penalty: -5.98388793805556
+overlap_potential 1.465784 packing_fraction 1.448677
+>>>Penalty: -2.109781150526447
+overlap_potential 0.534370 packing_fraction 0.582173
+>>>Penalty: -9.09722973870407
+overlap_potential 4.025090 packing_fraction 3.539967
+>>>Penalty: -2.1614348355273996
+overlap_potential 0.776251 packing_fraction 0.421543
+>>>Penalty: -9.126408092166484
+overlap_potential 3.939629 packing_fraction 3.568110
+>>>Penalty: -2.111764971258338
+overlap_potential 0.543769 packing_fraction 0.448695
+>>>Penalty: -8.530832194689783
+overlap_potential 3.079628 packing_fraction 3.041571
+>>>Penalty: -2.159449930098066
+overlap_potential 0.767063 packing_fraction 0.538901
+>>>Penalty: -2.0193993930714504
+overlap_potential 0.096530 packing_fraction 0.305350
+>>>Penalty: -2.000511715672
+overlap_potential 0.002558 packing_fraction 0.334041
+>>>Penalty: -5.643553384270955
+overlap_potential 1.409278 packing_fraction 1.239625
+>>>Penalty: -2.208820173914352
+overlap_potential 0.993113 packing_fraction 0.865731
+>>>Penalty: -2.1767830323392614
+overlap_potential 0.847009 packing_fraction 0.825169
+>>>Penalty: -2.0525462917171153
+overlap_potential 0.259339 packing_fraction 0.511454
+>>>Penalty: -2.078954300273549
+overlap_potential 0.387178 packing_fraction 0.757596
+>>>Penalty: -2.111807801645668
+overlap_potential 0.543972 packing_fraction 0.563604
+>>>Penalty: -6.45300130229851
+overlap_potential 1.577459 packing_fraction 1.706492
+>>>Penalty: -2.089312693690242
+overlap_potential 0.436880 packing_fraction 0.337569
+>>>Penalty: -7.014457167335202
+overlap_potential 2.195203 packing_fraction 2.019399
+>>>Penalty: -10.39942823326776
+overlap_potential 5.618591 packing_fraction 5.137672
+>>>Penalty: -2.1021612087830985
+overlap_potential 0.498188 packing_fraction 0.864602
+>>>Penalty: -7.336748259650617
+overlap_potential 2.223038 packing_fraction 2.209910
+>>>Penalty: -10.632523005272978
+overlap_potential 6.231322 packing_fraction 5.525036
+>>>Penalty: -8.068515345916662
+overlap_potential 2.798991 packing_fraction 2.690695
+>>>Penalty: -6.074882947469635
+overlap_potential 1.441406 packing_fraction 1.499677
+>>>Penalty: -2.1281493158325673
+overlap_potential 0.621056 packing_fraction 0.381602
+>>>Penalty: -2.155814167461547
+overlap_potential 0.750213 packing_fraction 0.403664
+>>>Penalty: -2.2118678330079824
+overlap_potential 1.006902 packing_fraction 0.937517
+>>>Penalty: -2.113246814513142
+overlap_potential 0.550784 packing_fraction 0.897349
+>>>Penalty: -2.0266661232117285
+overlap_potential 0.132450 packing_fraction 0.278372
+>>>Penalty: -2.205476596120062
+overlap_potential 0.977964 packing_fraction 0.560237
+>>>Penalty: -8.441495775837321
+overlap_potential 3.802096 packing_fraction 2.970305
+>>>Penalty: -9.657543895664123
+overlap_potential 4.873748 packing_fraction 4.132549
+>>>Penalty: -2.077624569761384
+overlap_potential 0.380780 packing_fraction 0.198417
+>>>Penalty: -2.0142076808254084
+overlap_potential 0.070787 packing_fraction 0.378122
+>>>Penalty: -10.00360370805171
+overlap_potential 4.917631 packing_fraction 4.564038
+>>>Penalty: -2.1069376806337488
+overlap_potential 0.520884 packing_fraction 0.431394
+>>>Penalty: -2.1085785684253926
+overlap_potential 0.528669 packing_fraction 0.407499
+>>>Penalty: -2.071088203649981
+overlap_potential 0.349270 packing_fraction 0.352407
+>>>Penalty: -5.902775890905522
+overlap_potential 1.208721 packing_fraction 1.402204
+>>>Penalty: -6.837331358503806
+overlap_potential 2.001305 packing_fraction 1.918653
+>>>Penalty: -2.13999362962945
+overlap_potential 0.676557 packing_fraction 0.560035
+>>>Penalty: -13.039029159219313
+overlap_potential 17.820105 packing_fraction 15.457717
+>>>Penalty: -2.1137179284201846
+overlap_potential 0.553013 packing_fraction 0.610476
+>>>Penalty: -2.1461261767491875
+overlap_potential 0.705173 packing_fraction 0.403322
+>>>Penalty: -6.033203033817396
+overlap_potential 1.366265 packing_fraction 1.476436
+>>>Penalty: -13.927429352856297
+overlap_potential 39.134189 packing_fraction 33.226597
+>>>Penalty: -2.1188731915968146
+overlap_potential 0.577373 packing_fraction 0.337067
+>>>Penalty: -6.015352718720281
+overlap_potential 1.116130 packing_fraction 1.466424
+>>>Penalty: -2.005538087971995
+overlap_potential 0.027652 packing_fraction 0.406382
+>>>Penalty: -2.066652751531476
+overlap_potential 0.327831 packing_fraction 0.614832
+>>>Penalty: -6.574221536178453
+overlap_potential 1.836257 packing_fraction 1.772736
+>>>Penalty: -2.0873010436077006
+overlap_potential 0.427247 packing_fraction 0.695323
+>>>Penalty: -14.763028482074395
+overlap_potential 2198.524326 packing_fraction 1957.978707
+>>>Penalty: -5.490020864399842
+overlap_potential 0.946116 packing_fraction 1.109778
+>>>Penalty: -6.658219477255746
+overlap_potential 1.834611 packing_fraction 1.818935
+>>>Penalty: -6.650057023054685
+overlap_potential 1.918979 packing_fraction 1.814432
+>>>Penalty: -2.0126433451474752
+overlap_potential 0.063018 packing_fraction 0.346110
+>>>Penalty: -10.716950976435458
+overlap_potential 5.859578 packing_fraction 5.676015
+>>>Penalty: -6.356401366901691
+overlap_potential 1.473075 packing_fraction 1.653896
+>>>Penalty: -8.141347589956558
+overlap_potential 3.383489 packing_fraction 2.743178
+>>>Penalty: -2.035663077521056
+overlap_potential 0.176744 packing_fraction 0.421683
+>>>Penalty: -11.072132310640294
+overlap_potential 7.599648 packing_fraction 6.384744
+>>>Penalty: -14.543502004779928
+overlap_potential 134.837850 packing_fraction 124.475454
+>>>Penalty: -7.948486713819318
+overlap_potential 2.826372 packing_fraction 2.606251
+>>>Penalty: -7.673966679099458
+overlap_potential 3.014444 packing_fraction 2.421894
+>>>Penalty: -2.161351083752345
+overlap_potential 0.775863 packing_fraction 0.183465
+>>>Penalty: -2.002185741271283
+overlap_potential 0.010923 packing_fraction 0.242661
+>>>Penalty: -6.620654313230832
+overlap_potential 1.988889 packing_fraction 1.798237
+>>>Penalty: -6.30960223909868
+overlap_potential 2.124791 packing_fraction 1.628422
+>>>Penalty: -2.0922845655463997
+overlap_potential 0.451094 packing_fraction 0.567084
+>>>Penalty: -11.63311252837337
+overlap_potential 9.286758 packing_fraction 7.823868
+>>>Penalty: -2.1925681816253704
+overlap_potential 0.919264 packing_fraction 0.270653
+>>>Penalty: -2.1628252750260395
+overlap_potential 0.782682 packing_fraction 0.545866
+>>>Penalty: -10.612066760605126
+overlap_potential 5.905075 packing_fraction 5.489353
+>>>Penalty: -10.91912887646944
+overlap_potential 11.509188 packing_fraction 6.063775
+>>>Penalty: -11.813342705142738
+overlap_potential 9.863190 packing_fraction 8.400214
+>>>Penalty: -5.445519376811864
+overlap_potential 0.809322 packing_fraction 1.042286
+>>>Penalty: -2.1477792090525964
+overlap_potential 0.712872 packing_fraction 0.735966
+>>>Penalty: -2.041426929444673
+overlap_potential 0.205019 packing_fraction 0.349994
+>>>Penalty: -13.5167379111586
+overlap_potential 25.724114 packing_fraction 21.905217
+>>>Penalty: -7.31283587435945
+overlap_potential 2.492287 packing_fraction 2.195406
+>>>Penalty: -2.0667933951994844
+overlap_potential 0.328511 packing_fraction 0.677896
+>>>Penalty: -2.015638129301898
+overlap_potential 0.077887 packing_fraction 0.489375
+>>>Penalty: -2.0115996622061605
+overlap_potential 0.057831 packing_fraction 0.284310
+>>>Penalty: -2.161632026193199
+overlap_potential 0.777163 packing_fraction 0.867403
