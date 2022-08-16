@@ -90,9 +90,10 @@ class Scenario(object):
             if (agent.volume > agent.volume_elite): 
                 reward = 0.
             else:
-                reward = reward_coefficient * (agent.volume_elite - agent.volume)/agent.volume_elite
-                # TODO the save the difference of the agent.volume_elite and agent.volume in the class
-                # TODO return diff_this/diff_last
+                reward = reward_coefficient * (agent.volume_elite - agent.volume)/agent.dv_prev
+                agent.dv_prev = agent.volume_elite - agent.volume
+                # the save the difference of the agent.volume_elite and agent.volume in the class
+                # return diff_this/diff_last
                 packing.cell.volume_elite = agent.volume
                 # print(f">>>Reward: {reward}") ##
 
