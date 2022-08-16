@@ -47,3 +47,6 @@ the xy-plane, and the third in the z > 0 half space.
 * Observation space: particle info (scaled coordinate + quaternion + aspherical shape) + three cell vectors
 * (!!!) Reward function: The reduction in the volume of cell could possibly arisen from increasing overlap in the packing.
 
+# Experiment.01
+
+<img width="375" alt="image" src="https://user-images.githubusercontent.com/37290277/184924363-f6004a68-0cec-47ed-85e5-0105a24c5de9.png">
