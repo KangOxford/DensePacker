@@ -436,10 +436,10 @@ class Packing(object):
         if (self.fraction > 1.):
             penalty = 1. + (1. - 1./self.fraction)**2
         else:
-            # print(self.upbound_image)
             # need further calculation
-            penalty = self.overlap_potential / 10.
-
+	    # overlap potential is roughly less than 6 (empiricial)
+            penalty = self.overlap_potential / 6.
+	
         return penalty
 
     def build_list(self):
