@@ -418,7 +418,7 @@ class Packing(object):
                     pa_new.periodic_check(self.cell.state.lattice.T)
                     
                     for index in extended_list:
-                        vector = np.matmul(index, self.cell.lattice)
+                        vector = np.matmul(index, self.cell.state.lattice)
                         particle_i = particle_b.periodic_image(vector-particle_b.state.centroid)
                         distance = np.linalg.norm(particle_i.state.centroid - pa_new.state.centroid)
                         if distance < self.max_od:
@@ -436,10 +436,10 @@ class Packing(object):
         if (self.fraction > 1.):
             penalty = 1. + (1. - 1./self.fraction)**2
         else:
-            # print(self.upbound_image)
             # need further calculation
-            penalty = self.overlap_potential / 10.
-
+	    # overlap potential is roughly less than 6 (empiricial)
+            penalty = self.overlap_potential / 6.
+	
         return penalty
 
     def build_list(self):

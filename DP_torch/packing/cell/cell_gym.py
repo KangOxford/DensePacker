@@ -3,12 +3,7 @@ import numpy as np
 import gym
 from gym import spaces
 from gym.utils import seeding
-
-from packing.scenario import Scenario
 from utils import data_scale
-
-
-scenario = Scenario()
 
 # environment for unit cell agent in the packing
 class CellEnv(gym.Env):
@@ -77,7 +72,7 @@ class CellEnv(gym.Env):
         return obs
 
     def render(self):
-        print("overlap_potential {:2f} packing_fraction {:2f}".format(self.packing.overlap_potential, self.packing.fraction))
+        print("is_overlap {:d} packing_fraction {:2f}".format(self.packing.is_overlap, self.packing.fraction))
 
     def _set_action(self, action):
 
