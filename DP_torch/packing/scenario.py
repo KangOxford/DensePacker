@@ -76,20 +76,21 @@ class Scenario(object):
         packing.cell.volume_elite = packing.cell.volume
 
     def reward(self, packing):
-
-        # the reduction of cell volume between two steps
+        
         penalty_coefficient = 1.0
-        if packing.cell_penalty > 0:
-            reward = - penalty_coefficient * math.exp(packing.cell_penalty)
+        penalty = packing.cell_penalty
+        if penalty > 0:
+            reward = - penalty_coefficient * math.log(penalty+1.)
             # print(f">>>Penalty: {reward}") ##
         else:
             # the reduction of cell volume between two steps
             agent = packing.cell
-            reward = (agent.volume_elite - agent.volume) / packing.volume_allp
-            if reward > 0.: 
+            if (agent.volume > agent.volume_elite): 
+                reward = 0.
+            else:
+                reward = (agent.volume_elite - agent.volume)
                 packing.cell.volume_elite = agent.volume
-                #reward += 1.
-            # print(f">>>Reward: {reward}") ##
+                # print(f">>>Reward: {reward}") ##
 
         return reward
     
