@@ -28,7 +28,7 @@ model = PPO("MlpPolicy", env, verbose=1, tensorboard_log="./ppo_densepacking_ten
 # model.learn(total_timesteps=int(1e3), tb_log_name="eighth_run", reset_num_timesteps=False)
 # model.learn(total_timesteps=int(1e3), tb_log_name="ninth_run", reset_num_timesteps=False)
 # model.learn(total_timesteps=int(1e6), tb_log_name="subsequent_run", reset_num_timesteps=False)
-model.learn(total_timesteps=int(1e30), tb_log_name="samll_1_penalty_run")
+model.learn(total_timesteps=int(1e30), tb_log_name="normal_4_penalty_run")
 model.save("ppo_densepacking-v11")
 
 obs = env.reset()
