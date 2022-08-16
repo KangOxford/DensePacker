@@ -418,7 +418,7 @@ class Packing(object):
                     pa_new.periodic_check(self.cell.state.lattice.T)
                     
                     for index in extended_list:
-                        vector = np.matmul(index, self.cell.lattice)
+                        vector = np.matmul(index, self.cell.state.lattice)
                         particle_i = particle_b.periodic_image(vector-particle_b.state.centroid)
                         distance = np.linalg.norm(particle_i.state.centroid - pa_new.state.centroid)
                         if distance < self.max_od:
