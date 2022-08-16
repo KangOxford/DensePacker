@@ -8,7 +8,7 @@
             "name": "Python: Current File",
             "type": "python",
             "request": "launch",
-            "pythonPath": "/workspace/anaconda3/envs/dp/lib/python3.7/python",
+            "python": "/workspace/anaconda3/envs/dp/lib/python3.7/python",
             "program": "${file}",
             "console": "integratedTerminal",
             "justMyCode": true
