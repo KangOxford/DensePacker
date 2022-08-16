@@ -50,3 +50,6 @@ the xy-plane, and the third in the z > 0 half space.
 # Experiment.01
 
 <img width="375" alt="image" src="https://user-images.githubusercontent.com/37290277/184924363-f6004a68-0cec-47ed-85e5-0105a24c5de9.png">
+
+<img width="823" alt="image" src="https://user-images.githubusercontent.com/37290277/184924894-fb3d1d07-035c-4b02-8bc8-68bb75e36a0d.png">
+
