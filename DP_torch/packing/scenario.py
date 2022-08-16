@@ -82,6 +82,7 @@ class Scenario(object):
         penalty = packing.cell_penalty
         if penalty > 0:
             reward = - penalty_coefficient * math.exp(penalty)
+            # TODO revise this part to achieve the precision of -1e-10
             # print(f">>>Penalty: {reward}") ##
         else:
             # the reduction of cell volume between two steps
