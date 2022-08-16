@@ -3,12 +3,7 @@ import numpy as np
 import gym
 from gym import spaces
 from gym.utils import seeding
-
-from packing.scenario import Scenario
 from utils import data_scale
-
-
-scenario = Scenario()
 
 # environment for unit cell agent in the packing
 class CellEnv(gym.Env):
