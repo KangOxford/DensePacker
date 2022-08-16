@@ -168,7 +168,7 @@ class Cell(object):
 
         # initial and previous volume
         self.volume_elite = None
-        self.volume_prev = None
+        self.dv_prev = 1.
 
         self.state = CellState()
         self.action = CellAction()
