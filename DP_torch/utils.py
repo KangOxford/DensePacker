@@ -32,13 +32,20 @@ class Transform():
         mat = transforms.euler_angles_to_matrix(x, "ZYX")
         return mat
     
-    def euler2qua(self, angle):
+    def euler2qua(self, angle, convention='Hamilton'):
         """
-        Convert euler angle to quaternion
+        Convert euler angle to quaternion (two type of convention):
+            Hamilton = (w, x, y, z), by default
+            JPL = (x, y, z, w)  
         """
         x = self.euler2mat(angle)
         qua = transforms.matrix_to_quaternion(x)
-        return qua
+
+        if convention == 'Hamilton': return qua
+        elif convention == 'JPL':
+            temp = torch.tensor(np.expand_dims(qua[0], 0))
+            return torch.cat([qua[1:], temp])
+
 
 def data_scale(unscaled, from_range, to_range):
     x = (unscaled - from_range[0]) / (from_range[1] - from_range[0])
@@ -142,15 +149,12 @@ def Fun_AB(t, XA, XB, r):
     return F_AB[0][0]
 
 
-
-
-
 def output_xyz(filename, packing):
     """
     For visulaization in ovito
     """
     centroid = [particle.centroid for particle in packing.visable_particles]
-    quaternion = [Transform().euler2qua(particle.orientation) for particle in packing.visable_particles]
+    quaternion = [Transform().euler2qua(particle.orientation, 'JPL') for particle in packing.visable_particles]
     semi_axis = [particle.semi_axis for particle in packing.visable_particles]
     color = [particle.color for particle in packing.visable_particles]
 
