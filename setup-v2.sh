@@ -14,17 +14,12 @@ pip install ipython
 pip install tensorflow
 pip install tensorboard
 
-export PYTHONPATH=/workspace/DensePacking/DP_torch:$PYTHONPATH
+# export PYTHONPATH=/workspace/DensePacking/DP_torch:$PYTHONPATH
+export PYTHONPATH=/content/drive/MyDrive/DensePacking/DP_torch:$PYTHONPATH
 
 
 # python -m cProfile -s cumulative /workspace/DensePacking/DP_torch/train_cell_gym.py > analysis_train_cell_gym.txt
 # python /workspace/DensePacking/DP_torch/train_cell_gym.py > log_train_cell_gym-v10.txt
 # python /workspace/DensePacking/DP_torch/train_cell_gym.py
 
-# tensorboard --logdir /workspace/DensePacking/ppo_densepacking_tensorboard-3/
-# tensorboard --logdir /workspace/DensePacking/ppo_densepacking_tensorboard-4/
-# tensorboard --logdir /workspace/DensePacking/ppo_densepacking_tensorboard-5/
-# tensorboard --logdir /workspace/DensePacking/ppo_densepacking_tensorboard-7/
-# tensorboard --logdir /workspace/DensePacking/ppo_densepacking_tensorboard-8/
-# tensorboard --logdir /workspace/DensePacking/ppo_densepacking_tensorboard-10/
-# tensorboard --logdir /workspace/DensePacking/ppo_densepacking_tensorboard-11/
+# python /content/drive/MyDrive/DensePacking/DP_torch/test_cell_gym.py > log_test_cell_gym-v18.txt
