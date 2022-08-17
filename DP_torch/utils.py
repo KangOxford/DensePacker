@@ -1,7 +1,7 @@
 import numpy as np
 
-import torch
-from pytorch3d import transforms
+import tensorflow as tf
+from tensorflow_graphics.geometry import transformation
 from scipy import optimize
 
 
@@ -28,23 +28,19 @@ class Transform():
         """
         Convert rotations given as Euler angles in radians to rotation matrices.
         """
-        x = torch.as_tensor(angle, dtype=torch.double)
-        mat = transforms.euler_angles_to_matrix(x, "ZYX")
+        x = tf.convert_to_tensor(angle, dtype=np.double)
+        mat = transformation.rotation_matrix_3d.from_euler(x)
         return mat
     
-    def euler2qua(self, angle, convention='Hamilton'):
+    def euler2qua(self, angle):
         """
         Convert euler angle to quaternion (two type of convention):
             Hamilton = (w, x, y, z), by default
             JPL = (x, y, z, w)  
         """
-        x = self.euler2mat(angle)
-        qua = transforms.matrix_to_quaternion(x)
-
-        if convention == 'Hamilton': return qua
-        elif convention == 'JPL':
-            temp = torch.tensor(np.expand_dims(qua[0], 0))
-            return torch.cat([qua[1:], temp])
+        x = tf.convert_to_tensor(angle, dtype=np.double)
+        qua = transformation.quaternion.from_euler(x)
+        return qua
 
 
 def data_scale(unscaled, from_range, to_range):
@@ -154,7 +150,7 @@ def output_xyz(filename, packing):
     For visulaization in ovito
     """
     centroid = [particle.centroid for particle in packing.visable_particles]
-    quaternion = [Transform().euler2qua(particle.orientation, 'JPL') for particle in packing.visable_particles]
+    quaternion = [Transform().euler2qua(particle.orientation) for particle in packing.visable_particles]
     semi_axis = [particle.semi_axis for particle in packing.visable_particles]
     color = [particle.color for particle in packing.visable_particles]
 

@@ -1,10 +1,8 @@
 import math
-from statistics import variance
 import numpy as np
 
 from utils import Transform
 from packing.core import Packing, Cell, Ellipsoid, Sphere
-
 
 class Scenario(object):
     def build_packing(self):

@@ -5,15 +5,24 @@ from gym import spaces
 from gym.utils import seeding
 from utils import data_scale
 
+from packing.scenario import Scenario
+
+scenario = Scenario()
+
 # environment for unit cell agent in the packing
 class CellEnv(gym.Env):
     metadata = {
         'render.modes': ['human', 'rgb_array']
     }
 
-    def __init__(self, packing, reset_callback=None, reward_callback=None,
-                 observation_callback=None, done_callback=None,
-                 penalty_callback=None, mode:str="rotation"):
+    def __init__(self, 
+                 packing=scenario.build_packing(), 
+                 reset_callback=scenario.reset_packing, 
+                 reward_callback=scenario.reward,
+                 observation_callback=scenario.observation, 
+                 done_callback=scenario.done,
+                 cost_callback=scenario.cell_penalty,
+                 mode:str="rotation"):
 
         self.packing = packing
         self.agent = self.packing.cell
@@ -23,7 +32,7 @@ class CellEnv(gym.Env):
         self.reward_callback = reward_callback
         self.observation_callback = observation_callback
         self.done_callback = done_callback
-        self.penalty_callback = penalty_callback
+        self.cost_callback = cost_callback
         # motion mode
         self.mode = mode
 
@@ -47,7 +56,6 @@ class CellEnv(gym.Env):
         return [seed]
 
     def step(self, action):
-        
         self._set_action(action)
         # advance cell state in a packing
         self.packing.cell_step(self.mode)
@@ -57,7 +65,7 @@ class CellEnv(gym.Env):
         reward = self.reward_callback(self.packing)
         done = self.done_callback(self.packing)
 
-        info = {}
+        info = self.cost()
 
         return obs, reward, done, info
 
@@ -70,6 +78,9 @@ class CellEnv(gym.Env):
         # record observation
         obs = self.observation_callback(self.packing)
         return obs
+
+    def cost(self):
+        return self.cost_callback(self.packing)
 
     def render(self):
         print("is_overlap {:d} overlap_potential {:2f} packing_fraction {:2f}".format(self.packing.is_overlap, self.packing.overlap_potential,self.packing.fraction))
