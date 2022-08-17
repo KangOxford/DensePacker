@@ -74,27 +74,14 @@ class Scenario(object):
         packing.cell.volume_elite = packing.cell.volume
 
     def reward(self, packing):
-        
-        penalty_coefficient = 1.0
-        reward_coefficient = 5.0
-        penalty = packing.cell_penalty
-        if penalty > 0:
-            reward = - penalty_coefficient * math.exp(penalty)
-            # TODO revise this part to achieve the precision of -1e-10
-            # print(f">>>Penalty: {reward}") ##
+        agent = packing.cell
+        if (agent.volume > agent.volume_elite): 
+            reward = 0.
         else:
             # the reduction of cell volume between two steps
-            agent = packing.cell
-            if (agent.volume > agent.volume_elite): 
-                reward = 0.
-            else:
-                reward = reward_coefficient * (agent.volume_elite - agent.volume)/agent.dv_prev
-                agent.dv_prev = agent.volume_elite - agent.volume
-                # the save the difference of the agent.volume_elite and agent.volume in the class
-                # return diff_this/diff_last
-                packing.cell.volume_elite = agent.volume
-                # print(f">>>Reward: {reward}") ##
-
+            reward = agent.volume_elite - agent.volume
+            packing.cell.volume_elite = agent.volume
+      
         return reward
     
     def cell_penalty(self, packing):
