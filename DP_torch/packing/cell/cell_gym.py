@@ -3,12 +3,7 @@ import numpy as np
 import gym
 from gym import spaces
 from gym.utils import seeding
-
-from packing.scenario import Scenario
 from utils import data_scale
-
-
-scenario = Scenario()
 
 # environment for unit cell agent in the packing
 class CellEnv(gym.Env):
@@ -55,7 +50,7 @@ class CellEnv(gym.Env):
         
         self._set_action(action)
         # advance cell state in a packing
-        self.packing.cell_step(self.method)
+        self.packing.cell_step(self.mode)
 
         # reward and observation
         obs = self.observation_callback(self.packing)
@@ -63,7 +58,6 @@ class CellEnv(gym.Env):
         done = self.done_callback(self.packing)
 
         info = {}
-        info.update(self.cost())
 
         return obs, reward, done, info
 
@@ -76,6 +70,9 @@ class CellEnv(gym.Env):
         # record observation
         obs = self.observation_callback(self.packing)
         return obs
+
+    def render(self):
+        print("is_overlap {:d} overlap_potential {:2f} packing_fraction {:2f}".format(self.packing.is_overlap, self.packing.overlap_potential,self.packing.fraction))
 
     def _set_action(self, action):
 

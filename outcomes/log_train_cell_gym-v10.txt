@@ -1,0 +1,14 @@
+Using cpu device
+Wrapping the env with a `Monitor` wrapper
+Wrapping the env in a DummyVecEnv.
+Logging to ./ppo_densepacking_tensorboard-v10/big20_penalty_run_1
+----------------------------------
+| rollout/           |           |
+|    ep_len_mean     | 109       |
+|    ep_rew_mean     | -5.73e+03 |
+| time/              |           |
+|    fps             | 16        |
+|    iterations      | 1         |
+|    time_elapsed    | 122       |
+|    total_timesteps | 2048      |
+----------------------------------

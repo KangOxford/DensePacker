@@ -66,7 +66,6 @@ class Scenario(object):
             
                     if id in [0, 3, 4]: variable[id] = 2.*variable[id] - 1.
                     lattice[i][j] = variable[id] * packing.cell_bound[1]
-
             packing.cell.state.lattice = lattice
         else:
             packing.cell.state.lattice = np.array([[4., 0,  0], [0,  2., 0], [0,  0,  2.]])
@@ -74,19 +73,29 @@ class Scenario(object):
         packing.cell.lattice_reduction()
         for particle in packing.particles:
             particle.periodic_check(packing.cell.state.lattice.T)
-
         packing.cell.volume_elite = packing.cell.volume
 
     def reward(self, packing):
-        # the reduction of cell volume between two steps
-        if packing.cell_penalty > 0:
-            reward = - math.exp(packing.cell_penalty)
+        
+        penalty_coefficient = 1.0
+        reward_coefficient = 5.0
+        penalty = packing.cell_penalty
+        if penalty > 0:
+            reward = - penalty_coefficient * math.exp(penalty)
+            # TODO revise this part to achieve the precision of -1e-10
+            # print(f">>>Penalty: {reward}") ##
         else:
+            # the reduction of cell volume between two steps
             agent = packing.cell
-            reward = (agent.volume_elite - agent.volume) / packing.volume_allp
-            if reward > 0.: 
-                packing.agent.volume_elite = agent.volume
-                #reward += 1.
+            if (agent.volume > agent.volume_elite): 
+                reward = 0.
+            else:
+                reward = reward_coefficient * (agent.volume_elite - agent.volume)/agent.dv_prev
+                agent.dv_prev = agent.volume_elite - agent.volume
+                # the save the difference of the agent.volume_elite and agent.volume in the class
+                # return diff_this/diff_last
+                packing.cell.volume_elite = agent.volume
+                # print(f">>>Reward: {reward}") ##
 
         return reward
     
@@ -110,7 +119,7 @@ class Scenario(object):
         particle_info = []
         for p in packing.particles:
             scaled_pos = p.scaled_centroid(packing.cell.state.lattice.T)
-            quaternion = Transform.euler2qua(p.state.orientation)
+            quaternion = Transform().euler2qua(angle = p.state.orientation)
             if packing.particle_type == 'ellipsoid':
                 particle_info.append(np.concatenate([scaled_pos] + [quaternion] + [p.semi_axis]))
         

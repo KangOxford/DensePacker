@@ -1,5 +1,3 @@
-from tkinter.messagebox import NO
-import torch
 import numpy as np
 
 import math
@@ -15,10 +13,6 @@ class Particle(object):
 
         # state: coordinate and euler angle
         self.state = ParticleState()
-
-        # control action range
-        self.tran_low = np.array([0., 0., 0.])
-        self.tran_high = np.array([0.1, 0.1, 0.1])
 
         # color
         self.color = None
@@ -56,6 +50,7 @@ class Particle(object):
 	
         self.state.centroid = np.matmul(lattice, scaled_pos.T).T
 
+
 class ParticleState(object):
     """
     Base state of all particles with (absolute) coordinate and euler angle.
@@ -66,6 +61,7 @@ class ParticleState(object):
         # (fai 0-2*PI; cita 0-PI; pesai 0-2*PI)
         self.orientation = None
 
+
 class ParticleAction(object):
     def __init__(self):
         # translation & rotation
@@ -75,8 +71,9 @@ class ParticleAction(object):
 
 class Sphere(Particle):
     def __init__(self):
+        super().__init__()
         self.dim = 3
-
+        
         # shape parameters
         self.radius = None
         
@@ -104,11 +101,16 @@ class Sphere(Particle):
 # specific particles
 class Ellipsoid(Particle):
     def __init__(self):
+        super().__init__()
         self.dim = 3
 
         # shape parameters (alpha: alpha^beta : 1)
         self.alpha = None
         self.beta = None
+	
+        # control action range
+        self.tran_low = np.array([0., 0., 0.])
+        self.tran_high = np.array([0.1, 0.1, 0.1])
         
         # script behavior to execute
         self.action_callback = None
@@ -142,7 +144,7 @@ class Ellipsoid(Particle):
         shape and orientation of the ellipsoid
         """
         # note that: rot_mat = Rz*Ry*Rx = Q^T
-        rot_mat = Transform.euler2mat(self.state.orientation)
+        rot_mat = Transform().euler2mat(self.state.orientation)
         
         # O: a diagonal matrix containing the major semi-axes
         O = np.diag(self.semi_axis)
@@ -166,7 +168,7 @@ class Cell(object):
 
         # initial and previous volume
         self.volume_elite = None
-        self.volume_prev = None
+        self.dv_prev = 1.
 
         self.state = CellState()
         self.action = CellAction()
@@ -354,22 +356,25 @@ class Packing(object):
         return self.particles + copy_particles
 
     @property
-    def cell_penalty(self):
+    def overlap_potential(self):
         """
         Calculate the external part of overlap potential for all overlaping pairs
         """
         image_list, extended_list = self.build_list()
 
         # calculate penalty
-        penalty = 0.
+        potential = 0.
         for a, particle_a in enumerate(self.particles):
             for b, particle_b in enumerate(self.particles):
+                # internal part (in the unit cell)
+                if (b > a): potential += overlap_fun(self.particle_type, particle_a, particle_b)
+
                 if (b == a):
                     # external part I (with one's own periodic images)
                     for index in image_list:
                         vector = np.matmul(index, self.cell.state.lattice)
                         particle_i = particle_b.periodic_image(vector)
-                        penalty += overlap_fun(self.particle_type, particle_a, particle_i)
+                        potential += overlap_fun(self.particle_type, particle_a, particle_i)
                 else:
                     # external part II (with other particles’ periodic images)
                     # make sure that particle_b located in the origin
@@ -381,12 +386,12 @@ class Packing(object):
                         particle_i = particle_b.periodic_image(vector-particle_b.state.centroid)
                         distance = np.linalg.norm(particle_i.state.centroid - pa_new.state.centroid)
                         if distance < self.max_od:
-                            penalty += overlap_fun(self.particle_type, pa_new, particle_i)
+                            potential += overlap_fun(self.particle_type, pa_new, particle_i)
 
-        return penalty
+        return potential
 
     @property  
-    def is_overlap(self):
+    def is_overlap(self) -> bool:
         for i in range(3):
             if ((np.linalg.norm(self.cell.state.lattice[i])-self.cell_bound[0]) < -1e-10): return True
 
@@ -413,7 +418,7 @@ class Packing(object):
                     pa_new.periodic_check(self.cell.state.lattice.T)
                     
                     for index in extended_list:
-                        vector = np.matmul(index, self.cell.lattice)
+                        vector = np.matmul(index, self.cell.state.lattice)
                         particle_i = particle_b.periodic_image(vector-particle_b.state.centroid)
                         distance = np.linalg.norm(particle_i.state.centroid - pa_new.state.centroid)
                         if distance < self.max_od:
@@ -421,6 +426,21 @@ class Packing(object):
                             if (potential > 1e-20): return True
 
         return False
+
+    @property
+    def cell_penalty(self):
+        """
+        Penalty function for constraint violation.
+        """
+        # obvious overlap: within the range of (1, 2)
+        if (self.fraction > 1.):
+            penalty = 1. + (1. - 1./self.fraction)**2
+        else:
+            # need further calculation
+	    # overlap potential is roughly less than 6 (empiricial)
+            penalty = self.overlap_potential / 6.
+	
+        return penalty
 
     def build_list(self):
         """
@@ -431,32 +451,31 @@ class Packing(object):
 
         # establish the equivalent set of images in the regular coordinate frame
         image_list = []
-        num_layer = 0
         for i in range(-num_image[0], num_image[0]+1):
             for j in range(-num_image[1], num_image[1]+1):
                 for k in range(-num_image[2], num_image[2]+1): 
                     if (i==j==k==0): continue
 
-                    # reduced self-image list
                     index = [i, j, k]
                     vec = np.matmul(index, self.cell.state.lattice)
+                    # reduced self-image list
                     if np.dot(vec, normal)<0. or np.linalg.norm(vec)>self.max_od: continue
-                    image_list.append(index) 
-                    
-                    # calculate max(i+j+k), and i,j,k should be non-negative simultaneously
-                    num_layer = int(max(num_layer, abs_norm(index, Relu=True)))      
+                    image_list.append(index)     
+
+        index_bound = np.max(image_list + [[0, 0, 0]], axis=0).tolist()
 
         # add 1 layer of images in the positive vi directions to the set
         extended_list = image_list.copy()
-        # 1 <= i+j+k <= layer+6
-        for i in range(num_layer+7):
-            for j in range(num_layer+7-i):
-                for k in range(relu(1-i-j), num_layer+7-i-j):
+        for i in range(index_bound[0]+2):
+            for j in range(index_bound[1]+2):
+                for k in range(index_bound[2]+2):
+                    if (i==j==k==0): continue
+
                     index = [i, j, k]
                     if (index not in image_list): extended_list.append(index)
 
         # concentric approach
-        if (len(image_list)>0): image_list.sort(key=abs_norm)
+        if (len(image_list) > 0): image_list.sort(key=abs_norm)
         extended_list.sort(key=abs_norm)
 
         return image_list, extended_list
@@ -471,7 +490,7 @@ class Packing(object):
         
         self.cell.origin = origin / self.num_particles
 
-    def cell_step(self, method):
+    def cell_step(self, mode):
         """
         Update cell in the packing.
         """
@@ -480,7 +499,7 @@ class Packing(object):
         self.fraction_prev = self.fraction
 
         # set action (small deformation)
-        if method == "strain_tensor":
+        if mode == "strain_tensor":
             deformation = np.multiply(self.agent.state.base, self.agent.action.strain)
             self.agent.state.base += deformation
             self.agent.state.length = [np.linalg.norm(x) for x in self.agent.state.base]
@@ -488,13 +507,13 @@ class Packing(object):
             
             self.agent.action.num += 1
 
-        elif method == "rotation":
-            mat = Transform.euler2mat(self.cell.action.angle)
-            self.cell.state.lattice = np.matmul(mat, self.cell.state.lattice)
+        elif mode == "rotation":
+            for i in range(self.dim):
+                mat = Transform().euler2mat(self.cell.action.angle[i])
+                self.cell.state.lattice[i] = np.matmul(mat, self.cell.state.lattice[i])
             self.cell.set_length(self.cell.action.length)
 
         self.cell.lattice_reduction()
-        # print(self.cell.state.lattice)
         for particle in self.particles:
             particle.periodic_check(self.cell.state.lattice.T)
 
