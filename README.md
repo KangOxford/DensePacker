@@ -3,10 +3,14 @@
 
 
 
-### Safe ristriction
+### SafeRL method
+Referces: https://zhuanlan.zhihu.com/p/407168691
+* XXX-Lagrangian: combine the Lagrangian approach with basic RL method
+* safety layer: 
+![v2-d27931e77c4414f982f3ed0be703f69e_720w](https://user-images.githubusercontent.com/72123149/185000859-5627fadb-272e-440f-bdea-75dd15111373.png)
+* others
 
-### PPO Lagrange
-
+# How to start?
 <!--* remember to run the lab in the dpenvironment via the command `conda activate dp`-->
 * `bash setup-v2.sh` each time on openning the gitpod ssh link.
 * use the command `ssh -L 16006:127.0.0.1:6006 'kangoxford-densepacking-yky9rdbuiid@kangoxford-densepacking-yky9rdbuiid.ssh.ws-eu61.gitpod.io'` if you want to run in vscode
