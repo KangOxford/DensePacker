@@ -42,6 +42,9 @@ class CellEnv(gym.Env):
 
         self.seed()
 
+        # perfomance
+        self.performance = 1.0
+
     def seed(self, seed=None):
         self.np_random, seed = seeding.np_random(seed)
         return [seed]
@@ -64,6 +67,20 @@ class CellEnv(gym.Env):
         }
 
         return obs, reward, done, info
+    
+    @property
+    def is_done(self):
+        threshold_value = 1e-5
+        this_performance = self.packing.fraction * self.packing.fraction / (self.self.packing.overlap_potential + 1e-10) 
+        prev_performance = self.performance
+        trend = (this_performance-prev_performance)/prev_performance # calculat the trend for judging if done
+        self.performance = this_performance # update the performance
+        if trend <= threshold_value: return True
+        else: return False
+
+    def get_reward(self):
+        # TODO get the reward wrt the self.is_done
+        pass
 
     def reset(self):
         # reset packing
