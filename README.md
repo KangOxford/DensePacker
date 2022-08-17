@@ -3,18 +3,28 @@
 
 
 
-### Safe ristriction
+### Safe Restriction
+* [Safe-Reinforcement-Learning-Baselines](https://github.com/chauncygu/Safe-Reinforcement-Learning-Baselines)
+* [Safe-Explorer](https://github.com/AgrawalAmey/safe-explorer)
+* [Almost Surely Safe RL Using State Augmentation](https://github.com/huawei-noah/HEBO/tree/master/SAUTE)
+
 
 ### PPO Lagrange
+* [PPO Lagrangian in Pytorch](https://github.com/akjayant/PPO_Lagrangian_PyTorch)
 
+### Experiment Setup
 <!--* remember to run the lab in the dpenvironment via the command `conda activate dp`-->
 * `bash setup-v2.sh` each time on openning the gitpod ssh link.
 * use the command `ssh -L 16006:127.0.0.1:6006 'kangoxford-densepacking-yky9rdbuiid@kangoxford-densepacking-yky9rdbuiid.ssh.ws-eu61.gitpod.io'` if you want to run in vscode
 * use this link to get login via gitpod `https://kangoxford-densepacking-yky9rdbuiid.ws-eu61.gitpod.io`
-* [colab file system](https://drive.google.com/drive/folders/1SRJ1L5yqpOKNAy1KzWORoDuKI1PlbUSq?usp=sharing)
+* [colab files](https://drive.google.com/drive/folders/1SRJ1L5yqpOKNAy1KzWORoDuKI1PlbUSq?usp=sharing)
 <!--* it should look like this `(dp) gitpod /workspace/DensePacking/DP_torch (main) $ `-->
 
 
+# Action Space Designing
+* Choice.01<br>
+![image](https://user-images.githubusercontent.com/37290277/185138157-6dd599a5-2a11-47c0-8140-1760e6e22382.png)
+* Choice.02<br>
 
 # Basic definition
   A packing P is defined as a collection of non-overlapping (i.e., hard) objects or particles in either a finite-sized container or d-dimensional Euclidean space R^d. The packing density \fai is defined as the fraction of space R^d covered by the particles. A problem that has been a source of fascination to mathematicians and scientists for centuries is the determination of the densest arrangement(s) of particles that do not tile space and the associated maximal density \fai_max.
