@@ -13,6 +13,7 @@ pip install stable-baselines3
 pip install ipython
 pip install tensorflow
 pip install tensorboard
+pip install tqdm
 
 # export PYTHONPATH=/workspace/DensePacking/DP_torch:$PYTHONPATH
 export PYTHONPATH=/content/drive/MyDrive/DensePacking/DP_torch:$PYTHONPATH
