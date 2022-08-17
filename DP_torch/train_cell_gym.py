@@ -16,11 +16,11 @@ packing = scenario.build_packing()
 
 env = CellEnv(packing, scenario.reset_packing, scenario.reward, scenario.observation, scenario.done)
 # model = PPO.load("/workspace/DensePacking/ppo_densepacking.zip")
-model = PPO("MlpPolicy", env, verbose=1, tensorboard_log="/content/drive/MyDrive/DensePacking/tensorboard/ppo_densepacking_tensorboard-v18/")
+model = PPO("MlpPolicy", env, verbose=1, tensorboard_log="/content/drive/MyDrive/DensePacker/tensorboard/ppo_densepacking_tensorboard-v18/")
 model.learn(total_timesteps=int(1e3), tb_log_name="new_penalty_run")
 for i in range(int(1e3)):
     model.learn(total_timesteps=int(1e5), tb_log_name="new_penalty_run", reset_num_timesteps=False)
-    model.save("ppo_densepacking-v18")
+    model.save("a","ppo_densepacking-v18")
 
 obs = env.reset()
 for i in range(int(1e2)):

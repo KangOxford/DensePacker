@@ -16,7 +16,7 @@ pip install tensorboard
 pip install tqdm
 
 # export PYTHONPATH=/workspace/DensePacking/DP_torch:$PYTHONPATH
-export PYTHONPATH=/content/drive/MyDrive/DensePacking/DP_torch:$PYTHONPATH
+export PYTHONPATH=/content/drive/MyDrive/DensePacker/DP_torch:$PYTHONPATH
 
 
 # python -m cProfile -s cumulative /workspace/DensePacking/DP_torch/train_cell_gym.py > analysis_train_cell_gym.txt
