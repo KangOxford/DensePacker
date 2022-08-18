@@ -61,8 +61,9 @@ class CellEnv(gym.Env):
         done = self.done_callback(self.packing)
 
         info = {
-            "is_overlap":self.packing.is_overlap,
-            "overlap_potential":self.packing.overlap_potential,
+#             "is_overlap":self.packing.is_overlap,
+#             "overlap_potential":self.packing.overlap_potential,
+            "cell_penalty":self.packing.cell_penalty,
             "packing_fraction":self.packing.fraction
         }
 

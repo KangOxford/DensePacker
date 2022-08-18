@@ -14,11 +14,12 @@ model = PPO.load("/content/drive/MyDrive/DensePacker/EliteDensePacker/ppo_densep
 
 info_list = []
 obs = env.reset()
-for i in tqdm(range(int(1e5))):
+for i in tqdm(range(int(1e3))):
+# for i in tqdm(range(int(1e5))):
     action, _states = model.predict(obs)
     obs, rewards, done, info = env.step(action)
     info_list.append(info)
     if done:
         env.reset()
  
-pd.DataFrame(info_list).to_csv("/content/drive/MyDrive/DensePacker/outcomes/analysis_test_cell_gym-v18.5.txt")
+pd.DataFrame(info_list).to_csv("/content/drive/MyDrive/DensePacker/outcomes/analysis_test_cell_gym-v18.5.csv")
