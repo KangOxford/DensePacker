@@ -2,6 +2,7 @@ import math
 from statistics import variance
 import numpy as np
 
+from copy import deepcopy
 from utils import Transform
 from packing.core import Packing, Cell, Ellipsoid, Sphere
 
@@ -117,9 +118,11 @@ class Scenario(object):
     def observation(self, packing):
         # the same as XYZ file
         particle_info = []
-        for p in packing.particles:
+        for particle in packing.particles:
+            p = deepcopy(particle)
+            p.periodic_check(packing.cell.state.lattice.T)
             scaled_pos = p.scaled_centroid(packing.cell.state.lattice.T)
-            quaternion = Transform().euler2qua(angle = p.state.orientation)
+            quaternion = Transform().euler2qua(p.state.orientation, 'JPL')
             if packing.particle_type == 'ellipsoid':
                 particle_info.append(np.concatenate([scaled_pos] + [quaternion] + [p.semi_axis]))
         
