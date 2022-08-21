@@ -27,3 +27,10 @@ for i in range(int(1e2)):
     action, _states = model.predict(obs)
     obs, rewards, dones, info = env.step(action)
     env.render()
+
+# Todo: penalty design
+# reward： * performance的提升 / per itself? which one???
+# mountain car gym reward (itself or divide)
+# gym.registered
+# fixed h
+# seals/walker2d-v0 fixed horizon

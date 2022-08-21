@@ -10,8 +10,6 @@ class Particle(object):
         self.name = ''
         # spatial dimensions
         self.dim = None
-
-        # state: coordinate and euler angle
         self.state = ParticleState()
 
         # color
@@ -157,7 +155,6 @@ class Ellipsoid(Particle):
 
 
 class Cell(object):
-   
     def __init__(self, dim):
         self.dim = dim
         # origin of lattice (located in the origin by default)
@@ -321,8 +318,7 @@ class Packing(object):
         The upper bounds to the number of images that need to be
         checked in each direction.
         """
-        cube = []
-        num_image = []
+        cube, num_image = [], []
         for i in range(2):
             for j in range(2):
                 for k in range(2):
@@ -437,7 +433,7 @@ class Packing(object):
             penalty = 1. + (1. - 1./self.fraction)**2
         else:
             # need further calculation
-	    # overlap potential is roughly less than 6 (empiricial)
+	          # overlap potential is roughly less than 6 (empiricial)
             penalty = self.overlap_potential / 6.
 	
         return penalty
