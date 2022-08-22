@@ -20,8 +20,12 @@
 
 # Action Space Designing
 * Choice.01<br>
+Uniform scaling (volume change) & deformation (shape change).<br>
+What is deformation?
+![image](https://baike.baidu.com/pic/%E5%89%AA%E5%88%87%E5%8F%98%E6%8D%A2/4969513/0/3bf33a87e950352a9906e5805843fbf2b3118bd7?fr=lemma&ct=single)
 ![image](https://user-images.githubusercontent.com/37290277/185138157-6dd599a5-2a11-47c0-8140-1760e6e22382.png)
 * Choice.02<br>
+Add a small strain of the fundamental cell, including both volume and shape changes.
 
 
 # Basic definition
