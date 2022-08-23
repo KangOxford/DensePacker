@@ -62,6 +62,7 @@ the trial is accepted.
 * Initial configurations: random, dilute, and without overlap (sometimes start from certain dilute
 packings).
 * Particle trial move(translation + rotation ): based on Metropolis acceptance (with no overlap), 1e3 momvements averagely per particle. The probabilitiies (sum=1) of translation and rotation are also controlled variables.
+![09b389e014699f100d10cdb8b2e0003](https://user-images.githubusercontent.com/72123149/186204588-045399f1-83c2-4a3d-8759-6d5d0f44a382.png)
 * Cell trial move (see Choice.02 in action design space): after the step of particle trial move. All particles will move correspondingly in this procedure. Cell trial move will be accepted when no overlap detected.
 * Conduct step2 and step3 repeatedly until the system can be compressed no more.
 
