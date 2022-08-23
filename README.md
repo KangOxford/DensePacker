@@ -21,12 +21,19 @@
 # Action Space Designing
 * Choice.01<br>
 Uniform scaling (volume change) & deformation (shape change).<br>
-What is deformation?
-![b8f1f6d68e00cfa97ec0090c2c8d64f8_hd](https://user-images.githubusercontent.com/72123149/185965879-a73886b4-9cf6-4862-a2d9-d9291f819e81.jpg)
 ![image](https://user-images.githubusercontent.com/37290277/185138157-6dd599a5-2a11-47c0-8140-1760e6e22382.png)
+
+
+Then what is deformation?
+
+![b8f1f6d68e00cfa97ec0090c2c8d64f8_hd](https://user-images.githubusercontent.com/72123149/185965879-a73886b4-9cf6-4862-a2d9-d9291f819e81.jpg)
+
 * Choice.02<br>
 Add a small strain of the fundamental cell, including both volume and shape changes.
 ![f0d9bdbd2124d551aab934f41b07e6f](https://user-images.githubusercontent.com/72123149/185965831-1c4ecf9f-59d6-4cfe-b860-b3459fe11953.png)
+
+* Choice.03<br>
+Here we employ random rotation on three vectors of the fundamental cell, and set their lengths as random variables.
 
 
 # Basic definition
