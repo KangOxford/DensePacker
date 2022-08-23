@@ -18,24 +18,6 @@
 * [Colab Files](https://drive.google.com/drive/folders/1SRJ1L5yqpOKNAy1KzWORoDuKI1PlbUSq?usp=sharing)
 <!--* it should look like this `(dp) gitpod /workspace/DensePacking/DP_torch (main) $ `-->
 
-# Action Space Designing
-* Choice.01<br>
-Uniform scaling (volume change) & deformation (shape change).<br>
-![image](https://user-images.githubusercontent.com/37290277/185138157-6dd599a5-2a11-47c0-8140-1760e6e22382.png)
-
-
-Then what is deformation?
-
-![b8f1f6d68e00cfa97ec0090c2c8d64f8_hd](https://user-images.githubusercontent.com/72123149/185965879-a73886b4-9cf6-4862-a2d9-d9291f819e81.jpg)
-
-* Choice.02<br>
-Add a small strain of the fundamental cell, including both volume and shape changes.
-![f0d9bdbd2124d551aab934f41b07e6f](https://user-images.githubusercontent.com/72123149/185965831-1c4ecf9f-59d6-4cfe-b860-b3459fe11953.png)
-
-* Choice.03<br>
-Here we employ random rotation on three vectors of the fundamental cell, and set their lengths as random variables.
-
-
 # Basic definition
   A packing P is defined as a collection of non-overlapping (i.e., hard) objects or particles in either a finite-sized container or d-dimensional Euclidean space R^d. The packing density \fai is defined as the fraction of space R^d covered by the particles. A problem that has been a source of fascination to mathematicians and scientists for centuries is the determination of the densest arrangement(s) of particles that do not tile space and the associated maximal density \fai_max.
 
@@ -67,6 +49,22 @@ length and orientation.
 * We do not make any assumptions concerning the orientation of the box here. A commonly used choice for variable-box-shape simulations is to have one of the box vectors along the x axis, another vector in the positive part of
 the xy-plane, and the third in the z > 0 half space.
 
+# Previous methodology
+### Adaptive shrinking cell scheme.<br> 
+The adaptive shrinking cell
+scheme is based on the standard Monte Carlo (MC) method, where
+the arbitrarily chosen particle is given random translation and rotation.
+The main improvement is that the adaptive shrinking cell
+scheme allows for deformation (compression/expansion) of the fundamental
+cell, leading to a higher packing density. During the
+procedure, a trial is rejected if any two particles overlap; otherwise,
+the trial is accepted.
+* Initial configurations: random, dilute, and without overlap (sometimes start from certain dilute
+packings).
+* Particle trial move(translation + rotation ): based on Metropolis acceptance (with no overlap), 1e3 momvements averagely per particle. The probabilitiies (sum=1) of translation and rotation are also controlled variables.
+* Cell trial move (see Choice.02 in action design space): after the step of particle trial move. All particles will move correspondingly in this procedure. Cell trial move will be accepted when no overlap detected.
+* Conduct step2 and step3 reaptedly until the system can be compressed no more.
+
 # Gym environment
 ### Cell_gym
   We firstly concentrate on a subproblem in which particles are fixed (both centroid and orientation) with adaptive cell. 
@@ -74,6 +72,26 @@ the xy-plane, and the third in the z > 0 half space.
 * Action space (12 variables): three sets of euler angle (for the rotation of cell vectors) + vector lengths
 * Observation space: particle info (scaled coordinate + quaternion + aspherical shape) + three cell vectors
 * (!!!) Reward function: The reduction in the volume of cell could possibly arisen from increasing overlap in the packing.
+
+# Action Space Designing
+* Choice.01<br>
+Uniform scaling (volume change) & deformation (shape change).<br>
+![image](https://user-images.githubusercontent.com/37290277/185138157-6dd599a5-2a11-47c0-8140-1760e6e22382.png)
+
+
+Then what is deformation?
+
+![b8f1f6d68e00cfa97ec0090c2c8d64f8_hd](https://user-images.githubusercontent.com/72123149/185965879-a73886b4-9cf6-4862-a2d9-d9291f819e81.jpg)
+
+* Choice.02<br>
+Add a small strain of the fundamental cell, including both volume and shape changes.<br>
+This choice can be seen as the generalized form of Choice.01.
+
+![f0d9bdbd2124d551aab934f41b07e6f](https://user-images.githubusercontent.com/72123149/185965831-1c4ecf9f-59d6-4cfe-b860-b3459fe11953.png)
+
+* Choice.03<br>
+Here we employ random rotation on three vectors of the fundamental cell, and set their lengths as random variables.
+
 
 # Experiment.01
 

@@ -166,6 +166,8 @@ class Cell(object):
         # initial and previous volume
         self.volume_elite = None
         self.dv_prev = 1.
+        self.performance = 1.
+        self.trend = None
 
         self.state = CellState()
         self.action = CellAction()

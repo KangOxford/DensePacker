@@ -68,16 +68,6 @@ class CellEnv(gym.Env):
         }
 
         return obs, reward, done, info
-    
-    @property
-    def is_done(self):
-        threshold_value = 1e-5
-        this_performance = self.packing.fraction * self.packing.fraction / (self.self.packing.overlap_potential + 1e-10) 
-        prev_performance = self.performance
-        trend = (this_performance-prev_performance)/prev_performance # calculat the trend for judging if done
-        self.performance = this_performance # update the performance
-        if trend <= threshold_value: return True
-        else: return False
 
     def get_reward(self):
         # TODO get the reward wrt the self.is_done

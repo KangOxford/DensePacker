@@ -27,7 +27,7 @@ class Scenario(object):
             for i, particle in enumerate(packing.particles):
                 particle.name = 'ellipsoid %d' % i
                 particle.color = np.array([0.51,0.792,0.992])
-                particle.alpha, particle.beta = 1., 0.
+                particle.alpha, particle.beta = math.sqrt(3), 0.
 
         # add cell
         packing.cell = Cell(packing.dim)
@@ -74,9 +74,15 @@ class Scenario(object):
 
     def reward(self, packing):
         
+        prev_performance = packing.cell.performance
+        penalty = packing.cell_penalty
+        packing.cell.performance = packing.fraction**2 / (penalty + 1e-10)
+        # calculat the trend for judging if done
+        packing.cell.trend = (packing.cell.performance-prev_performance)/prev_performance
+
         penalty_coefficient = 1.0
         reward_coefficient = 5.0
-        penalty = packing.cell_penalty
+
         if penalty > 0:
             reward = - penalty_coefficient * math.exp(penalty)
             # TODO revise this part to achieve the precision of -1e-10
@@ -132,6 +138,10 @@ class Scenario(object):
 
     def done(self, packing):
         #if packing.cell_penalty > 0.:
-        if packing.fraction_delta < 0.01:
-            return True
-        return False
+        # if packing.fraction_delta < 0.01:
+        #     return True
+        # return False
+
+        threshold_value = 1e-5
+        if packing.cell.trend <= threshold_value: return True
+        else: return False
