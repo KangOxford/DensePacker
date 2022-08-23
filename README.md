@@ -63,7 +63,7 @@ the trial is accepted.
 packings).
 * Particle trial move(translation + rotation ): based on Metropolis acceptance (with no overlap), 1e3 momvements averagely per particle. The probabilitiies (sum=1) of translation and rotation are also controlled variables.
 * Cell trial move (see Choice.02 in action design space): after the step of particle trial move. All particles will move correspondingly in this procedure. Cell trial move will be accepted when no overlap detected.
-* Conduct step2 and step3 reaptedly until the system can be compressed no more.
+* Conduct step2 and step3 repeatedly until the system can be compressed no more.
 
 # Gym environment
 ### Cell_gym
