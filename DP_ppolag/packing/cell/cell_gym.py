@@ -1,9 +1,11 @@
 import numpy as np
-
 import gym
 from gym import spaces
 from gym.utils import seeding
-from utils import data_scale
+from myutils import data_scale
+from packing.scenario import Scenario
+
+scenario = Scenario()
 
 # environment for unit cell agent in the packing
 class CellEnv(gym.Env):
@@ -11,9 +13,14 @@ class CellEnv(gym.Env):
         'render.modes': ['human', 'rgb_array']
     }
 
-    def __init__(self, packing, reset_callback=None, reward_callback=None,
-                 observation_callback=None, done_callback=None,
-                 penalty_callback=None, mode:str="rotation"):
+    def __init__(self, 
+                 packing=scenario.build_packing(), 
+                 reset_callback=scenario.reset_packing, 
+                 reward_callback=scenario.reward,
+                 observation_callback=scenario.observation, 
+                 done_callback=scenario.done,
+                 cost_callback=scenario.cell_penalty,
+                 mode:str="rotation"):
 
         self.packing = packing
         self.agent = self.packing.cell
@@ -23,7 +30,7 @@ class CellEnv(gym.Env):
         self.reward_callback = reward_callback
         self.observation_callback = observation_callback
         self.done_callback = done_callback
-        self.penalty_callback = penalty_callback
+        self.cost_callback = cost_callback
         # motion mode
         self.mode = mode
 
@@ -50,7 +57,9 @@ class CellEnv(gym.Env):
         return [seed]
 
     def step(self, action):
-        
+        ''' Take a step and return observation, reward, done, and info '''
+        info = {}
+
         self._set_action(action)
         # advance cell state in a packing
         self.packing.cell_step(self.mode)
@@ -59,19 +68,14 @@ class CellEnv(gym.Env):
         obs = self.observation_callback(self.packing)
         reward = self.reward_callback(self.packing)
         done = self.done_callback(self.packing)
-
-        info = {
-#             "is_overlap":self.packing.is_overlap,
-#             "overlap_potential":self.packing.overlap_potential,
-            "cell_penalty":self.packing.cell_penalty,
-            "packing_fraction":self.packing.fraction
-        }
+        info.update(self.cost())
 
         return obs, reward, done, info
 
     def get_reward(self):
         # TODO get the reward wrt the self.is_done
         pass
+    
 
     def reset(self):
         # reset packing
@@ -109,3 +113,21 @@ class CellEnv(gym.Env):
             self.agent.action.angle = data_scale(action[:, 0:3], from_range=(-1, 1), to_range=(0., 2.*np.pi))
             self.agent.action.angle[:, 1] /= 2.
             self.agent.action.length = data_scale(action[:, 3], from_range=(-1, 1), to_range=self.packing.cell_bound)
+
+    def cost(self):
+        ''' Calculate the current costs and return a dict '''
+        cost = {}
+        # Overlap processing
+        cost['cost_overlap'] = self.cost_callback(self.packing)
+
+        # Sum all costs into single total cost
+        cost['cost'] = sum(v for k, v in cost.items() if k.startswith('cost_'))
+
+        # # Optionally remove shaping from reward functions.
+        # if self.constrain_indicator:
+        #     for k in list(cost.keys()):
+        #         cost[k] = float(cost[k] > 0.0)  # Indicator function
+
+        self._cost = cost
+
+        return cost

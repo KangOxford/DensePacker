@@ -1,10 +1,8 @@
-from functools import partial
 import math
-from statistics import variance
 import numpy as np
 
 from copy import deepcopy
-from utils import Transform
+from myutils import Transform
 from packing.core import Packing, Cell, Ellipsoid, Sphere
 
 class Scenario(object):
@@ -70,7 +68,7 @@ class Scenario(object):
         packing.cell.lattice_reduction()
         for particle in packing.particles:
             particle.periodic_check(packing.cell.state.lattice.T)
-        packing.cell.volume_elite = packing.cell.volume
+        packing.cell.volume_elite = packing.cell.volume_prev = packing.cell.volume
 
     def reward(self, packing):
         
@@ -80,25 +78,9 @@ class Scenario(object):
         # calculat the trend for judging if done
         packing.cell.trend = (packing.cell.performance-prev_performance)/prev_performance
 
-        penalty_coefficient = 1.0
-        reward_coefficient = 5.0
-
-        if penalty > 0:
-            reward = - penalty_coefficient * math.exp(penalty)
-            # TODO revise this part to achieve the precision of -1e-10
-            # print(f">>>Penalty: {reward}") ##
-        else:
-            # the reduction of cell volume between two steps
-            agent = packing.cell
-            if (agent.volume > agent.volume_elite): 
-                reward = 0.
-            else:
-                reward = reward_coefficient * (agent.volume_elite - agent.volume)/agent.dv_prev
-                agent.dv_prev = agent.volume_elite - agent.volume
-                # the save the difference of the agent.volume_elite and agent.volume in the class
-                # return diff_this/diff_last
-                packing.cell.volume_elite = agent.volume
-                # print(f">>>Reward: {reward}") ##
+        agent = packing.cell
+        reward = agent.volume_prev - agent.volume
+        packing.cell.volume_prev = agent.volume
 
         return reward
     
