@@ -120,15 +120,20 @@ class Scenario(object):
     def observation(self, packing):
         # the same as XYZ file
         particle_info = []
-        for particle in packing.particles:
-            p = deepcopy(particle)
-            p.periodic_check(packing.cell.state.lattice.T)
-            scaled_pos = p.scaled_centroid(packing.cell.state.lattice.T)
-            quaternion = Transform().euler2qua(p.state.orientation, 'JPL')
-            if packing.particle_type == 'ellipsoid':
+
+        if packing.particle_type == 'ellipsoid':
+            for particle in packing.particles:
+                p = deepcopy(particle)
+                p.periodic_check(packing.cell.state.lattice.T)
+                scaled_pos = p.scaled_centroid(packing.cell.state.lattice.T)
+                quaternion = Transform().euler2qua(p.state.orientation, 'JPL')
                 particle_info.append(np.concatenate([scaled_pos] + [quaternion] + [p.semi_axis]))
         
-            elif packing.particle_type == 'sphere':
+        elif packing.particle_type == 'sphere':
+            for particle in packing.particles:
+                p = deepcopy(particle)
+                p.periodic_check(packing.cell.state.lattice.T)
+                scaled_pos = p.scaled_centroid(packing.cell.state.lattice.T)
                 particle_info.append(np.concatenate([scaled_pos] + [np.asarray([p.radius])]))
 
         # cell basis

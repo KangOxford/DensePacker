@@ -119,11 +119,11 @@ class Scenario(object):
         return np.concatenate(particle_info + cell_info)
 
     def done(self, packing):
-        #if packing.cell_penalty > 0.:
-        # if packing.fraction_delta < 0.01:
-        #     return True
-        # return False
+        # if packing.cell_penalty > 0.:
+        if packing.fraction_delta < 0.01:
+            return True
+        return False
 
-        threshold_value = 1e-5
-        if packing.cell.trend <= threshold_value: return True
-        else: return False
+        # threshold_value = 1e-5
+        # if packing.cell.trend <= threshold_value: return True
+        # else: return False

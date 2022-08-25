@@ -10,6 +10,7 @@ class Particle(object):
         self.name = ''
         # spatial dimensions
         self.dim = None
+        self.obs_dim = None
         self.state = ParticleState()
 
         # color
@@ -71,6 +72,7 @@ class Sphere(Particle):
     def __init__(self):
         super().__init__()
         self.dim = 3
+        self.obs_dim = 4
         
         # shape parameters
         self.radius = None
@@ -84,16 +86,12 @@ class Sphere(Particle):
 
     @property
     def inscribed_d(self):
-        """
-        diameter of the inscribed sphere
-        """
+        """ diameter of the inscribed sphere """
         return 2.*self.radius
 
     @property
     def outscribed_d(self):
-        """
-        diameter of the outscribed sphere
-        """
+        """ diameter of the outscribed sphere """
         return 2.*self.radius
 
 
@@ -101,6 +99,7 @@ class Ellipsoid(Particle):
     def __init__(self):
         super().__init__()
         self.dim = 3
+        self.obs_dim = 10
 
         # shape parameters (alpha: alpha^beta : 1)
         self.alpha = None
@@ -127,16 +126,12 @@ class Ellipsoid(Particle):
 
     @property
     def inscribed_d(self):
-        """
-        diameter of the outscribed sphere
-        """
+        """ Diameter of the outscribed sphere """
         return 2.*np.min(self.semi_axis)
 
     @property
     def outscribed_d(self):
-        """
-        diameter of the outscribed sphere
-        """
+        """ Diameter of the outscribed sphere """
         return 2.*np.max(self.semi_axis)
 
     @property
@@ -168,8 +163,8 @@ class Cell(object):
         self.color = None
 
         # initial and previous volume
-        self.volume_elite = None
         self.volume_prev = None
+        self.gap = None
         self.dv_prev = 1.
         self.performance = 1.
         self.trend = None
@@ -220,9 +215,7 @@ class Cell(object):
         return is_terminated
 
     def lattice_reduction(self):
-        """
-        Repeat the above procedure.
-        """
+        """ Repeat the above procedure. """
         if self.distortion > 1.5:
             terminal = False
             iter = 0
