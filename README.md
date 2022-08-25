@@ -144,7 +144,7 @@
 - Safe multi-agent reinforcement learning via shielding, [Paper](https://arxiv.org/pdf/2101.11196.pdf), Not Find Code (Accepted by AAMAS 2021)
 - CMIX: Deep Multi-agent Reinforcement Learning with Peak and Average Constraints, [Paper](https://2021.ecmlpkdd.org/wp-content/uploads/2021/07/sub_181.pdf), Not Find Code (Accepted by Joint European Conference on Machine Learning and Knowledge Discovery in Databases 2021)
 
-### Safe Restriction
+### Other references
 * [Safe-Reinforcement-Learning-Baselines](https://github.com/chauncygu/Safe-Reinforcement-Learning-Baselines)
 * [Safe-Explorer](https://github.com/AgrawalAmey/safe-explorer)
 * [Almost Surely Safe RL Using State Augmentation](https://github.com/huawei-noah/HEBO/tree/master/SAUTE)
