@@ -68,8 +68,6 @@ class Scenario(object):
             packing.cell.state.lattice = np.array([[4., 0,  0], [0,  2., 0], [0,  0,  2.]])
 
         packing.cell.lattice_reduction()
-        for particle in packing.particles:
-            particle.periodic_check(packing.cell.state.lattice.T)
         packing.cell.volume_elite = packing.cell.volume
 
     def reward(self, packing):

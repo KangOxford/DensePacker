@@ -328,8 +328,6 @@ def ppo(env_fn, actor_critic=core.MLPActorCritic, ac_kwargs=dict(), seed=0,
         train_v_iters=80
         for i in range(train_v_iters):
             
-            
-
             loss_v, loss_vc = compute_loss_v(data)
             vf_optimizer.zero_grad()
             loss_v.backward()

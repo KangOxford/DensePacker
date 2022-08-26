@@ -423,21 +423,6 @@ class Packing(object):
 
         return False
 
-    @property
-    def cell_penalty(self):
-        """
-        Penalty function for constraint violation.
-        """
-        # obvious overlap: within the range of (1, 2)
-        if (self.fraction > 1.):
-            penalty = 1. + (1. - 1./self.fraction)**2
-        else:
-            # need further calculation
-	          # overlap potential is roughly less than 6 (empiricial)
-            penalty = self.overlap_potential / 6.
-	
-        return penalty
-
     def build_list(self):
         """
         Construct the image list in the scaled coordinate frame
