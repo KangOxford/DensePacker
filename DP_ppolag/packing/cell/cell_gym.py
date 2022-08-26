@@ -1,4 +1,5 @@
 from copy import deepcopy
+import math
 import numpy as np
 import gym
 from gym import spaces
@@ -55,7 +56,7 @@ class CellEnv(gym.Env):
         # Particle info
         for particle in self.packing.particles:
             obs_space_dict[particle] = gym.spaces.Box(
-                -1.0, 1.0, (particle.obs_dim,), dtype=np.float32)
+                -1.0, np.inf, (particle.obs_dim,), dtype=np.float32)
         # Cell info
         obs_space_dict['cell'] = gym.spaces.Box(
             -np.inf, np.inf, (self.dim, self.dim), dtype=np.float32)
@@ -158,29 +159,23 @@ class CellEnv(gym.Env):
         info = {}
 
         self._set_action(action)
-        # advance cell state in a packing
-        self.cell.volume_prev = self.cell.volume
-        self.fraction_prev = self.fraction
 
         # set action (small deformation)
-        if mode == "strain_tensor":
+        if self.mode == "strain_tensor":
             deformation = np.multiply(self.agent.state.base, self.agent.action.strain)
             self.agent.state.base += deformation
             self.agent.state.length = [np.linalg.norm(x) for x in self.agent.state.base]
             self.agent.state.basis = [x / np.linalg.norm(x) for x in self.agent.state.base]
             
             self.agent.action.num += 1
-
-        elif mode == "rotation":
+        elif self.mode == "rotation":
             for i in range(self.dim):
-                mat = Transform().euler2mat(self.cell.action.angle[i])
-                self.cell.state.lattice[i] = np.matmul(mat, self.cell.state.lattice[i])
-            self.cell.set_length(self.cell.action.length)
+                mat = Transform().euler2mat(self.agent.action.angle[i])
+                self.agent.state.lattice[i] = np.matmul(mat, self.agent.state.lattice[i])
+            self.agent.set_length(self.cell.action.length)
 
-        self.cell.lattice_reduction()
-
-        self.fraction_delta = math.fabs(self.fraction - self.fraction_prev)
-        self.packing.cell_step(self.mode)
+        self.agent.lattice_reduction()
+        self.packing.fraction_delta = math.fabs(self.packing.fraction - self.packing.fraction_prev)
 
         # reward and observation
         reward = self.reward()

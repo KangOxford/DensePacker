@@ -471,34 +471,7 @@ class Packing(object):
         
         self.cell.origin = origin / self.num_particles
 
-    def cell_step(self, mode):
-        """
-        Update cell in the packing.
-        """
-        # store previous information
-        self.cell.volume_prev = self.cell.volume
-        self.fraction_prev = self.fraction
-
-        # set action (small deformation)
-        if mode == "strain_tensor":
-            deformation = np.multiply(self.agent.state.base, self.agent.action.strain)
-            self.agent.state.base += deformation
-            self.agent.state.length = [np.linalg.norm(x) for x in self.agent.state.base]
-            self.agent.state.basis = [x / np.linalg.norm(x) for x in self.agent.state.base]
-            
-            self.agent.action.num += 1
-
-        elif mode == "rotation":
-            for i in range(self.dim):
-                mat = Transform().euler2mat(self.cell.action.angle[i])
-                self.cell.state.lattice[i] = np.matmul(mat, self.cell.state.lattice[i])
-            self.cell.set_length(self.cell.action.length)
-
-        self.cell.lattice_reduction()
-        for particle in self.particles:
-            particle.periodic_check(self.cell.state.lattice.T)
-
-        self.fraction_delta = math.fabs(self.fraction - self.fraction_prev) #/ self.fraction_old
+    
 
     # update state of the packing
     def particle_step(self):

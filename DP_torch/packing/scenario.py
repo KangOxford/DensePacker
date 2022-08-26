@@ -123,9 +123,9 @@ class Scenario(object):
             for particle in packing.particles:
                 p = deepcopy(particle)
                 p.periodic_check(packing.cell.state.lattice.T)
-                scaled_pos = p.scaled_centroid(packing.cell.state.lattice.T)
+                # scaled_pos = p.scaled_centroid(packing.cell.state.lattice.T)
                 quaternion = Transform().euler2qua(p.state.orientation, 'JPL')
-                particle_info.append(np.concatenate([scaled_pos] + [quaternion] + [p.semi_axis]))
+                particle_info.append(np.concatenate([p.state.centroid] + [quaternion] + [p.semi_axis]))
         
         elif packing.particle_type == 'sphere':
             for particle in packing.particles:
