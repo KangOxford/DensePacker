@@ -64,12 +64,12 @@
 - Trial without error: Towards safe reinforcement learning via human intervention, [Paper](https://arxiv.org/pdf/1707.05173.pdf), [Code](https://github.com/gsastry/human-rl) (Accepted by AAMAS 2018)
 - Safe reinforcement learning: Learning with supervision using a constraint-admissible set, [Paper](https://ieeexplore.ieee.org/abstract/document/8430770), Not Find Code (Accepted by Annual American Control Conference (ACC) 2018)
 - Verification and repair of control policies for safe reinforcement learning, [Paper](https://link.springer.com/content/pdf/10.1007/s10489-017-0999-8.pdf), Not Find Code (Accepted by Applied Intelligence, 2018)
-- Safe Exploration in Continuous Action Spaces, [Paper](https://www.researchgate.net/profile/Gal-Dalal/publication/322756278_Safe_Exploration_in_Continuous_Action_Spaces/links/5a71e84faca2720bc0d940b3/Safe-Exploration-in-Continuous-Action-Spaces.pdf), [Code](https://github.com/AgrawalAmey/safe-explorer), (only Arxiv, 2018, citation 200+)
+- **Safe Exploration in Continuous Action Spaces**, [Paper](https://www.researchgate.net/profile/Gal-Dalal/publication/322756278_Safe_Exploration_in_Continuous_Action_Spaces/links/5a71e84faca2720bc0d940b3/Safe-Exploration-in-Continuous-Action-Spaces.pdf), [Code](https://github.com/AgrawalAmey/safe-explorer), (only Arxiv, 2018, citation 200+)
 - Safe exploration of nonlinear dynamical systems: A predictive safety filter for reinforcement learning, [Paper](https://www.researchgate.net/profile/Kim-Wabersich/publication/329641554_Safe_exploration_of_nonlinear_dynamical_systems_A_predictive_safety_filter_for_reinforcement_learning/links/5ede2aab299bf1d20bd87981/Safe-exploration-of-nonlinear-dynamical-systems-A-predictive-safety-filter-for-reinforcement-learning.pdf), Not Find Code (Arxiv, 2018, citation 40+)
 - Batch policy learning under constraints, [Paper](http://proceedings.mlr.press/v97/le19a/le19a.pdf), [Code](https://github.com/clvoloshin/constrained_batch_policy_learning) (Accepted by ICML 2019)
 - Safe Policy Improvement with Baseline Bootstrapping, [Paper](https://www.researchgate.net/profile/Romain-Laroche/publication/334749134_Safe_Policy_Improvement_with_Baseline_Bootstrapping/links/5d3f3b634585153e592ceeb4/Safe-Policy-Improvement-with-Baseline-Bootstrapping.pdf), Not Find Code (Accepted by ICML 2019)
-- Convergent Policy Optimization for Safe Reinforcement Learning, [Paper](https://proceedings.neurips.cc/paper/2019/file/db29450c3f5e97f97846693611f98c15-Paper.pdf), [Code](https://github.com/chauncygu/Safe-Reinforcement-Learning-Baseline/tree/main/Safe-RL/Safe_reinforcement_learning) (Accepted by NeurIPS 2019)
-- Constrained reinforcement learning has zero duality gap, [Paper](https://www.researchgate.net/profile/Luiz-Chamon/publication/336889860_Constrained_Reinforcement_Learning_Has_Zero_Duality_Gap/links/5ef4df204585155050726b42/Constrained-Reinforcement-Learning-Has-Zero-Duality-Gap.pdf), Not Find Code (Accepted by NeurIPS 2019)
+- **Convergent Policy Optimization for Safe Reinforcement Learning**, [Paper](https://proceedings.neurips.cc/paper/2019/file/db29450c3f5e97f97846693611f98c15-Paper.pdf), [Code](https://github.com/chauncygu/Safe-Reinforcement-Learning-Baseline/tree/main/Safe-RL/Safe_reinforcement_learning) (Accepted by NeurIPS 2019)
+- *Constrained reinforcement learning has zero duality gap*, [Paper](https://www.researchgate.net/profile/Luiz-Chamon/publication/336889860_Constrained_Reinforcement_Learning_Has_Zero_Duality_Gap/links/5ef4df204585155050726b42/Constrained-Reinforcement-Learning-Has-Zero-Duality-Gap.pdf), Not Find Code (Accepted by NeurIPS 2019)
 - Reinforcement learning with convex constraints, [Paper](https://www.cs.princeton.edu/~syoosefi/papers/NeurIPS2019.pdf), [Code](https://github.com/xkianteb/ApproPO) (Accepted by NeurIPS 2019)
 - Reward constrained policy optimization, [Paper](https://arxiv.org/pdf/1805.11074.pdf), Not Find Code (Accepted by ICLR 2019)
 - Supervised policy update for deep reinforcement learning, [Paper](https://arxiv.org/pdf/1805.11706.pdf), [Code](https://github.com/quanvuong/Supervised_Policy_Update), (Accepted by ICLR 2019)
@@ -154,7 +154,6 @@
 
 #### 3. Other references
 * [Safe-Reinforcement-Learning-Baselines](https://github.com/chauncygu/Safe-Reinforcement-Learning-Baselines)
-* [Safe-Explorer](https://github.com/AgrawalAmey/safe-explorer)
 * [Almost Surely Safe RL Using State Augmentation](https://github.com/huawei-noah/HEBO/tree/master/SAUTE)
 * [PPO Lagrangian in Pytorch](https://github.com/akjayant/PPO_Lagrangian_PyTorch)
 
