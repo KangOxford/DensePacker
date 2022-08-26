@@ -96,7 +96,7 @@
 - Safe reinforcement learning via projection on a safe set: How to achieve optimality?, [Paper](https://arxiv.org/pdf/2004.00915.pdf), Not Find Code (Accepted by IFAC 2020)
 - Learning Transferable Domain Priors for Safe Exploration in Reinforcement Learning, [Paper](https://arxiv.org/pdf/1909.04307.pdf), [Code](https://github.com/GKthom/Priors-for-safe-exploration), (Accepted by International Joint Conference on Neural Networks (IJCNN) 2020)
 - Safe reinforcement learning through meta-learned instincts, [Paper](https://arxiv.org/pdf/2005.03233.pdf), Not Find Code (Accepted by The Conference on Artificial Life 2020)
-- Learning safe policies with cost-sensitive advantage estimation, [Paper](https://openreview.net/pdf?id=uVnhiRaW3J), Not Find Code (Openreview 2020)
+- **Learning safe policies with cost-sensitive advantage estimation**, [Paper](https://openreview.net/pdf?id=uVnhiRaW3J), Not Find Code (Openreview 2020)
 - Safe reinforcement learning using probabilistic shields, [Paper](https://repository.ubn.ru.nl/bitstream/handle/2066/224966/224966.pdf?sequence=1), Not Find Code (2020)
 - A constrained reinforcement learning based approach for network slicing, [Paper](https://icnp20.cs.ucr.edu/proceedings/hdrnets/A%20Constrained%20Reinforcement%20Learning%20Based%20Approach%20for%20Network%20Slicing.pdf),  Not Find Code (Accepted by IEEE 28th International Conference on Network Protocols (ICNP) 2020)
 - Exploration-exploitation in constrained mdps, [Paper](https://arxiv.org/pdf/2003.02189.pdf), Not Find Code (Arxiv, 2020)
