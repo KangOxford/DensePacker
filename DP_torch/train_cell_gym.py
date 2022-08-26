@@ -36,5 +36,6 @@ for i in range(int(1e2)):
 # fixed h
 # seals/walker2d-v0 fixed horizon
 
-# tensorboard --logdir=./tensorboard/ppo_densepacking_tensorboard-v19/new_done_run_0 --port 8123
+# tensorboard --logdir=./tensorboard/ppo_densepacking_tensorboard-v20/period_remove_run_0 --port 8123
+# /mnt/Edisk/andrew/DensePacking-1/tensorboard/ppo_densepacking_tensorboard-v20/period_remove_run_0
 
