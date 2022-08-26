@@ -516,9 +516,6 @@ class Packing(object):
             self.cell.set_length(self.cell.action.length)
 
         self.cell.lattice_reduction()
-        for particle in self.particles:
-            particle.periodic_check(self.cell.state.lattice.T)
-
         self.fraction_delta = math.fabs(self.fraction - self.fraction_prev) #/ self.fraction_old
 
     # update state of the packing

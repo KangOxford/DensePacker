@@ -66,26 +66,8 @@ class Scenario(object):
             packing.cell.state.lattice = np.array([[4., 0,  0], [0,  2., 0], [0,  0,  2.]])
 
         packing.cell.lattice_reduction()
-        for particle in packing.particles:
-            particle.periodic_check(packing.cell.state.lattice.T)
         packing.cell.volume_elite = packing.cell.volume_prev = packing.cell.volume
 
-    def reward(self, packing):
-        
-        prev_performance = packing.cell.performance
-        penalty = packing.cell_penalty
-        packing.cell.performance = packing.fraction**2 / (penalty + 1e-10)
-        # calculat the trend for judging if done
-        packing.cell.trend = (packing.cell.performance-prev_performance)/prev_performance
-
-        agent = packing.cell
-        reward = agent.volume_prev - agent.volume
-        packing.cell.volume_prev = agent.volume
-
-        return reward
-    
-    def cell_penalty(self, packing):
-        return packing.cell_penalty
 
     def particle_energy(self, particle, packing):
         # potential energy for certain particle
@@ -99,31 +81,4 @@ class Scenario(object):
                     u_local += 0.5 * potential**2
         return -u_local
 
-    def observation(self, packing):
-        # the same as XYZ file
-        particle_info = []
-        for particle in packing.particles:
-            p = deepcopy(particle)
-            p.periodic_check(packing.cell.state.lattice.T)
-            scaled_pos = p.scaled_centroid(packing.cell.state.lattice.T)
-            quaternion = Transform().euler2qua(p.state.orientation, 'JPL')
-            if packing.particle_type == 'ellipsoid':
-                particle_info.append(np.concatenate([scaled_pos] + [quaternion] + [p.semi_axis]))
-        
-            elif packing.particle_type == 'sphere':
-                particle_info.append(np.concatenate([scaled_pos] + [np.asarray([p.radius])]))
-
-        # cell basis
-        cell_info = (packing.cell.state.lattice).tolist()
-        
-        return np.concatenate(particle_info + cell_info)
-
-    def done(self, packing):
-        # if packing.cell_penalty > 0.:
-        if packing.fraction_delta < 0.01:
-            return True
-        return False
-
-        # threshold_value = 1e-5
-        # if packing.cell.trend <= threshold_value: return True
-        # else: return False
+    

@@ -346,8 +346,7 @@ def ppo(env_fn, actor_critic=core.MLPActorCritic, ac_kwargs=dict(), seed=0,
                      DeltaLossPi=(loss_pi.item() - pi_l_old),
                      DeltaLossV=(loss_v.item() - v_l_old))
         
-
-
+        
     # Prepare for interaction with environment
     start_time = time.time()
     o, ep_ret,ep_cret, ep_len = env.reset(), 0, 0, 0
