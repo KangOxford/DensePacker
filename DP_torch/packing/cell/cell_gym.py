@@ -106,6 +106,6 @@ class CellEnv(gym.Env):
 
             action = action.reshape(3, -1)
 
-            self.agent.action.angle = data_scale(action[:, 0:3], from_range=(-1, 1), to_range=(0., 2.*np.pi))
+            self.agent.action.angle *= np.pi
             self.agent.action.angle[:, 1] /= 2.
             self.agent.action.length = data_scale(action[:, 3], from_range=(-1, 1), to_range=self.packing.cell_bound)

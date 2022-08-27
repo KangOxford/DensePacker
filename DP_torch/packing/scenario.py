@@ -1,6 +1,4 @@
-from functools import partial
 import math
-from statistics import variance
 import numpy as np
 
 from copy import deepcopy
@@ -119,20 +117,19 @@ class Scenario(object):
         # the same as XYZ file
         particle_info = []
 
+        particles = deepcopy(packing.particles)
         if packing.particle_type == 'ellipsoid':
-            for particle in packing.particles:
-                p = deepcopy(particle)
-                p.periodic_check(packing.cell.state.lattice.T)
-                # scaled_pos = p.scaled_centroid(packing.cell.state.lattice.T)
-                quaternion = Transform().euler2qua(p.state.orientation, 'JPL')
-                particle_info.append(np.concatenate([p.state.centroid] + [quaternion] + [p.semi_axis]))
+            for particle in particles:
+                particle.periodic_check(packing.cell.state.lattice.T)
+                # scaled_pos = partiicle.scaled_centroid(packing.cell.state.lattice.T)
+                quaternion = Transform().euler2qua(particle.state.orientation, 'JPL')
+                particle_info.append(np.concatenate([particle.state.centroid] + [quaternion] + [particle.semi_axis]))
         
         elif packing.particle_type == 'sphere':
-            for particle in packing.particles:
-                p = deepcopy(particle)
-                p.periodic_check(packing.cell.state.lattice.T)
-                scaled_pos = p.scaled_centroid(packing.cell.state.lattice.T)
-                particle_info.append(np.concatenate([scaled_pos] + [np.asarray([p.radius])]))
+            for particle in particles:
+                particle.periodic_check(packing.cell.state.lattice.T)
+                scaled_pos = particle.scaled_centroid(packing.cell.state.lattice.T)
+                particle_info.append(np.concatenate([scaled_pos] + [np.asarray([particle.radius])]))
 
         # cell basis
         cell_info = (packing.cell.state.lattice).tolist()

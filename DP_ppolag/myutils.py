@@ -45,6 +45,15 @@ class Transform():
         elif convention == 'JPL':
             temp = torch.tensor(np.expand_dims(qua[0], 0))
             return torch.cat([qua[1:], temp])
+    
+    def euler_rotate(self, angle, point):
+        """ Apply the rotation given by a quaternion to a 3D point. """
+        p = torch.as_tensor(point, dtype=torch.double)
+        x = self.euler2mat(angle)
+        qua = transforms.matrix_to_quaternion(x)
+
+        y = transforms.quaternion_apply(qua, p)
+        return y.numpy()
 
 
 def data_scale(unscaled, from_range, to_range):

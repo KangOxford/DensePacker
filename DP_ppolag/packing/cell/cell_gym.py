@@ -1,10 +1,9 @@
-from copy import deepcopy
-import math
 import numpy as np
 import gym
 from gym import spaces
 from gym.utils import seeding
 
+from copy import deepcopy
 from collections import OrderedDict
 from myutils import *
 from packing.scenario import Scenario
@@ -12,6 +11,7 @@ from packing.scenario import Scenario
 scenario = Scenario()
 
 # environment for unit cell agent in the packing
+
 
 class CellEnv(gym.Env):
     metadata = {
@@ -107,22 +107,23 @@ class CellEnv(gym.Env):
         ''' Return the observation of cell agent '''
         particle_info = []
 
+        particles = deepcopy(self.packing.particles)
         if self.packing.particle_type == 'ellipsoid':
-            for particle in self.packing.particles:
-                p = deepcopy(particle)
-                p.periodic_check(self.agent.state.lattice.T)
-                scaled_pos = p.scaled_centroid(self.agent.state.lattice.T)
-                quaternion = Transform().euler2qua(p.state.orientation, 'JPL')
+            for particle in particles:
+                particle.periodic_check(self.agent.state.lattice.T)
+                scaled_pos = particle.scaled_centroid(
+                    self.agent.state.lattice.T)
+                quaternion = Transform().euler2qua(particle.state.orientation, 'JPL')
                 particle_info.append(np.concatenate(
-                    [scaled_pos] + [quaternion] + [p.semi_axis]))
+                    [scaled_pos] + [quaternion] + [particle.semi_axis]))
 
         elif self.packing.particle_type == 'sphere':
-            for particle in self.packing.particles:
-                p = deepcopy(particle)
-                p.periodic_check(self.agent.cell.state.lattice.T)
-                scaled_pos = p.scaled_centroid(self.agent.state.lattice.T)
+            for particle in particles:
+                particle.periodic_check(self.agent.state.lattice.T)
+                scaled_pos = particle.scaled_centroid(
+                    self.agent.state.lattice.T)
                 particle_info.append(np.concatenate(
-                    [scaled_pos] + [np.asarray([p.radius])]))
+                    [scaled_pos] + [np.asarray([particle.radius])]))
 
         # cell basis
         cell_info = (self.agent.state.lattice).tolist()
@@ -130,7 +131,7 @@ class CellEnv(gym.Env):
         obs = np.concatenate(particle_info + cell_info)
 
         return obs
-    
+
     def cost(self):
         ''' Calculate the current costs and return a dict '''
         cost = {}
@@ -162,20 +163,23 @@ class CellEnv(gym.Env):
 
         # set action (small deformation)
         if self.mode == "strain_tensor":
-            deformation = np.multiply(self.agent.state.base, self.agent.action.strain)
+            deformation = np.multiply(
+                self.agent.state.base, self.agent.action.strain)
             self.agent.state.base += deformation
-            self.agent.state.length = [np.linalg.norm(x) for x in self.agent.state.base]
-            self.agent.state.basis = [x / np.linalg.norm(x) for x in self.agent.state.base]
-            
+            self.agent.state.length = [np.linalg.norm(
+                x) for x in self.agent.state.base]
+            self.agent.state.basis = [
+                x / np.linalg.norm(x) for x in self.agent.state.base]
+
             self.agent.action.num += 1
         elif self.mode == "rotation":
-            for i in range(self.dim):
-                mat = Transform().euler2mat(self.agent.action.angle[i])
-                self.agent.state.lattice[i] = np.matmul(mat, self.agent.state.lattice[i])
+            self.agent.state.lattice = Transform().euler_rotate(
+                self.agent.action.angle, self.agent.state.lattice)
             self.agent.set_length(self.cell.action.length)
 
         self.agent.lattice_reduction()
-        self.packing.fraction_delta = math.fabs(self.packing.fraction - self.packing.fraction_prev)
+        self.packing.fraction_delta = np.fabs(
+            self.packing.fraction - self.packing.fraction_prev)
 
         # reward and observation
         reward = self.reward()
@@ -222,12 +226,7 @@ class CellEnv(gym.Env):
 
             action = action.reshape(3, -1)
 
-            self.agent.action.angle = data_scale(
-                action[:, 0:3], from_range=(-1, 1), to_range=(0., 2.*np.pi))
+            self.agent.action.angle = action[:, 0:3] * np.pi
             self.agent.action.angle[:, 1] /= 2.
             self.agent.action.length = data_scale(
                 action[:, 3], from_range=(-1, 1), to_range=self.packing.cell_bound)
-
-    
-
-    

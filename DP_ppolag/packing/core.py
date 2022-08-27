@@ -275,9 +275,7 @@ class Packing(object):
     
     @property
     def volume_allp(self):
-        """
-        volume of all particles
-        """
+        """ volume of all particles """
         volume = 0.
         for particle in self.particles:
             volume += particle.volume
@@ -292,9 +290,7 @@ class Packing(object):
 
     @property
     def cell_bound(self):
-        """
-        Lower and upper bound for cell vectors
-        """
+        """ Lower and upper bound for cell vectors """
         lbound = ubound = 0.
         for particle in self.particles:
             lbound = max(particle.inscribed_d, lbound)
@@ -470,8 +466,6 @@ class Packing(object):
             origin += particle.state.centroid
         
         self.cell.origin = origin / self.num_particles
-
-    
 
     # update state of the packing
     def particle_step(self):
