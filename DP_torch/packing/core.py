@@ -468,9 +468,9 @@ class Packing(object):
 
         # add 1 layer of images in the positive vi directions to the set
         extended_list = image_list.copy()
-        for i in range(index_bound[0]+2):
-            for j in range(index_bound[1]+2):
-                for k in range(index_bound[2]+2):
+        for i in range(index_bound[0]+3):
+            for j in range(index_bound[1]+3):
+                for k in range(index_bound[2]+3):
                     if (i==j==k==0): continue
 
                     index = [i, j, k]
