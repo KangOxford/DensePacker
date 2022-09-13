@@ -137,7 +137,7 @@ class Ellipsoid(Particle):
     @property
     def char_mat(self):
         """
-        characteristic ellipsoid matrix describing the 
+        Characteristic ellipsoid matrix describing the 
         shape and orientation of the ellipsoid
         """
         # note that: rot_mat = Rz*Ry*Rx = Q^T

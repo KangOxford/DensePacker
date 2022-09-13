@@ -62,7 +62,7 @@ class CellEnv(gym.Env):
 
         info = {
 #             "is_overlap":self.packing.is_overlap,
-#             "overlap_potential":self.packing.overlap_potential,
+#             "overlap_potential":self.packing.potential_energy,
             "cell_penalty":self.packing.cell_penalty,
             "packing_fraction":self.packing.fraction
         }
@@ -84,7 +84,7 @@ class CellEnv(gym.Env):
         return obs
 
     def render(self):
-        print("is_overlap {:d} overlap_potential {:2f} packing_fraction {:2f}".format(self.packing.is_overlap, self.packing.overlap_potential,self.packing.fraction))
+        print("is_overlap {:d} overlap_potential {:2f} packing_fraction {:2f}".format(self.packing.is_overlap, self.packing.potential_energy,self.packing.fraction))
 
     def _set_action(self, action):
 

@@ -15,6 +15,9 @@ class Particle(object):
         # color
         self.color = None
 
+        # translational degree of freedom
+        self.tran = None
+
     def scaled_centroid(self, lattice):
         """
         Convert absolute centroid to the one in scaled coordinate frame.
@@ -105,6 +108,9 @@ class Ellipsoid(Particle):
         # shape parameters (alpha: alpha^beta : 1)
         self.alpha = None
         self.beta = None
+
+        # rotational degree of freedom
+        self.rot = None
 	
         # control action range
         self.tran_low = np.array([0., 0., 0.])
@@ -156,6 +162,14 @@ class Ellipsoid(Particle):
         matrix = np.matmul(matrix, np.transpose(rot_mat))
 
         return matrix
+
+    @property
+    def grad(self) -> np.array:
+      grad_t = - self.tran
+      grad_r = - 2. * self.rot / self.outscribed_d
+
+      return np.concatenate([grad_t, grad_r], axis=0)
+
 
 
 class Cell(object):
@@ -358,25 +372,21 @@ class Packing(object):
         return self.particles + copy_particles
 
     @property
-    def overlap_potential(self):
-        """
-        Calculate the external part of overlap potential for all overlaping pairs
-        """
+    def potential_energy(self, cal_force=False):
         image_list, extended_list = self.build_list()
 
-        # calculate penalty
         potential = 0.
         for a, particle_a in enumerate(self.particles):
             for b, particle_b in enumerate(self.particles):
                 # internal part (in the unit cell)
-                if (b > a): potential += overlap_fun(self.particle_type, particle_a, particle_b)
+                if (b > a): potential += overlap_fun(self.particle_type, particle_a, particle_b, cal_force)
 
                 if (b == a):
                     # external part I (with one's own periodic images)
                     for index in image_list:
                         vector = np.matmul(index, self.cell.state.lattice)
                         particle_i = particle_b.periodic_image(vector)
-                        potential += overlap_fun(self.particle_type, particle_a, particle_i)
+                        potential += overlap_fun(self.particle_type, particle_a, particle_i, cal_force)
                 else:
                     # external part II (with other particles’ periodic images)
                     # make sure that particle_b located in the origin
@@ -388,10 +398,27 @@ class Packing(object):
                         particle_i = particle_b.periodic_image(vector-particle_b.state.centroid)
                         distance = np.linalg.norm(particle_i.state.centroid - pa_new.state.centroid)
                         if distance < self.max_od:
-                            potential += overlap_fun(self.particle_type, pa_new, particle_i)
+                            potential += overlap_fun(self.particle_type, pa_new, particle_i, cal_force)
 
         return potential
 
+    @property
+    def energy_grad(self):
+      if self.particle_type == 'ellipsoid':
+        for particle in self.particles:
+          particle.tran = np.zeros(3)
+          particle.rot = np.zero(3)  
+      elif self.particle_type == 'sphere':
+        for particle in self.particles:
+          particle.tran = np.zeros(3)
+      
+      energy = self.potential_energy(cal_force=True)
+      grad = []
+      for particle in self.particles:
+        grad.append(particle.grad)
+      
+      return np.vstack(grad)
+        
     @property  
     def is_overlap(self) -> bool:
         for i in range(3):
@@ -440,7 +467,7 @@ class Packing(object):
         else:
             # need further calculation
 	          # overlap potential is roughly less than 6 (empiricial)
-            penalty = self.overlap_potential / 6.
+            penalty = self.potential_energy / 6.
 	
         return penalty
 
