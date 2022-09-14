@@ -59,6 +59,14 @@ class Transform():
         y = transforms.quaternion_apply(qua, p)
         return y.numpy()
 
+    def euler_random(self):
+        qua = transforms.random_quaternions(n=1, dtype=torch.double)
+        x = transforms.quaternion_to_matrix(qua)
+
+        y = transforms.matrix_to_euler_angles(x, "ZYX")
+        return y[0].numpy()
+
+
 
 def data_scale(unscaled, from_range, to_range):
     x = (unscaled - from_range[0]) / (from_range[1] - from_range[0])
@@ -139,20 +147,8 @@ def overlap_fun(type, particle_a, particle_b, contact_force=False):
         X_B = particle_b.char_mat
 
         t_c = optimize.fminbound(lambda t: - Fun_AB(t, X_A, X_B, r_AB), 0, 1)
-        if (contact_force):
-            f, vn, vc = Fun_AB(t_c, X_A, X_B, r_AB, verbose=True)
-            r_ac = r_AB + vc
-
-            delta = np.sqrt(1. + f)
-            force = delta * (1.-delta) * vn / np.dot(r_AB, vn)
-            particle_a.tran -= force
-            particle_b.tran += force
-            particle_a.rot += np.cross(r_ac, - force)
-            particle_b.rot += np.cross(vc, force)
-        else:
-            f = Fun_AB(t_c, X_A, X_B, r_AB)
-            delta = np.sqrt(1. + f)
-
+        f = Fun_AB(t_c, X_A, X_B, r_AB)
+        delta = np.sqrt(1. + f)
         # overlap_p = 0.5 * Heaviside(-f) * f**2
         overlap_p = 0.5 * Heaviside(-f) * (1.-delta)**2
 
@@ -165,13 +161,11 @@ def overlap_fun(type, particle_a, particle_b, contact_force=False):
     return overlap_p
 
 
-def Fun_AB(t, XA, XB, r, verbose=False):
+def Fun_AB(t, XA, XB, r):
     """
     Calculation of Perram-Wertheim function:
 
     F_AB = t(1-t)r^T Y^{-1} r - 1, where Y = t*XB^{-1}+(1-t)*XA^{-1}
-
-    rc = rB - t*XB^{-1} n, where n = Y^{-1} r
     """
     Y = t*np.linalg.pinv(XB) + (1.-t)*np.linalg.pinv(XA)
     Y = np.linalg.pinv(Y)
@@ -180,17 +174,7 @@ def Fun_AB(t, XA, XB, r, verbose=False):
     F_AB = t*(1.-t)*np.matmul(F_AB, r.reshape(-1, 1)) - 1.
 
     assert len(F_AB) == 1
-    if verbose:
-        normal_vec = np.matmul(Y, r.T).T
-        normal_vec /= np.linalg.norm(normal_vec)
-
-        inv_B = np.linalg.pinv(XB)
-        relative_vec = -t * np.matmul(inv_B, normal_vec.T).T
-
-        return F_AB[0][0], normal_vec, relative_vec
-
-    else:
-        return F_AB[0][0]
+    return F_AB[0][0]
 
 
 def output_xyz(filename, packing):

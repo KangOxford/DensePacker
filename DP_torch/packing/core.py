@@ -51,6 +51,8 @@ class Particle(object):
 	
         self.state.centroid = np.matmul(lattice, scaled_pos.T).T
 
+    def random_orientation(self):
+        self.state.orientation = Transform().euler_random()
 
 class ParticleState(object):
     """
@@ -59,7 +61,6 @@ class ParticleState(object):
     def __init__(self):
         self.centroid = None
         # the z-y-x rotation convention (Tait-Bryan angles)
-        # (fai 0-2*PI; cita 0-PI; pesai 0-2*PI)
         self.orientation = None
 
 
@@ -173,7 +174,7 @@ class Ellipsoid(Particle):
 
 
 class Cell(object):
-    def __init__(self, dim):
+    def __init__(self, dim, mode):
         self.dim = dim
         # origin of lattice (located in the origin by default)
         self.origin = None
@@ -186,6 +187,9 @@ class Cell(object):
         self.dv_prev = 1.
         self.performance = 1.
         self.trend = None
+
+        self.mode = mode
+        self.strainMod = 1e-2
 
         self.state = CellState()
         self.action = CellAction()
@@ -401,23 +405,6 @@ class Packing(object):
                             potential += overlap_fun(self.particle_type, pa_new, particle_i, cal_force)
 
         return potential
-
-    @property
-    def energy_grad(self):
-      if self.particle_type == 'ellipsoid':
-        for particle in self.particles:
-          particle.tran = np.zeros(3)
-          particle.rot = np.zero(3)  
-      elif self.particle_type == 'sphere':
-        for particle in self.particles:
-          particle.tran = np.zeros(3)
-      
-      energy = self.potential_energy(cal_force=True)
-      grad = []
-      for particle in self.particles:
-        grad.append(particle.grad)
-      
-      return np.vstack(grad)
         
     @property  
     def is_overlap(self) -> bool:
@@ -471,6 +458,31 @@ class Packing(object):
 	
         return penalty
 
+    def dilute_initialize(self):
+        relative_pos = []
+        for i in range(self.num_particles):
+          relative_pos.append(np.random.rand(self.dim))
+        
+        min_d = 4.*np.sqrt(3)
+        for a in range(self.num_particles):
+          for b in range(self.num_particles):
+            if a >= b: continue
+
+            for i in range(-1, 2):
+              for j in range(-1, 2):
+                for k in range(-1, 2): 
+                  pos = np.array([i, j, k], dtype=int)
+                  temp_d = np.linalg.norm(relative_pos[b] - relative_pos[a] - pos)
+                  min_d = min(min_d, temp_d)
+        
+        length = 1.001*self.max_od/min_d
+
+        for i, particle in enumerate(self.particles):
+          particle.state.centroid = length * relative_pos[i]
+          particle.random_orientation()
+        
+        self.cell.state.lattice = length * np.eye(self.dim)
+
     def build_list(self):
         """
         Construct the image list in the scaled coordinate frame
@@ -519,43 +531,24 @@ class Packing(object):
         
         self.cell.origin = origin / self.num_particles
 
-    def cell_step(self, mode):
+    def cell_step(self):
         """
         Update cell in the packing.
         """
         # store previous information
         self.cell.volume_prev = self.cell.volume
-        self.fraction_prev = self.fraction
+        fraction_prev = self.fraction
 
         # set action (small deformation)
-        if mode == "strain_tensor":
-            deformation = np.multiply(self.agent.state.base, self.agent.action.strain)
-            self.agent.state.base += deformation
-            self.agent.state.length = [np.linalg.norm(x) for x in self.agent.state.base]
-            self.agent.state.basis = [x / np.linalg.norm(x) for x in self.agent.state.base]
-            
-            self.agent.action.num += 1
+        if self.cell.mode == "strain_tensor":
+            deformation = np.multiply(self.cell.state.lattice, self.cell.action.strain)
+            self.cell.state.lattice += deformation
 
-        elif mode == "rotation":
+        elif self.cell.mode == "rotation":
             self.cell.state.lattice = Transform().euler_rotate(
                 self.cell.action.angle, self.cell.state.lattice)
             self.cell.set_length(self.cell.action.length)
 
         self.cell.lattice_reduction()
-        self.fraction_delta = math.fabs(self.fraction - self.fraction_prev) #/ self.fraction_old
-
-    # update state of the packing
-    def particle_step(self):
-        # set actions for the agent
-        self.agent.action = self.agent.action_callback(self)
-
-        # get information (lattice constant)
-        self.agent.length = self.get_length()
-
-        # update the packing fraction
-        fraction_old = self.fraction
-
-        self.fraction = self.volume_allp / self.agent.volume
-        self.fraction_delta = (self.fraction - fraction_old) / fraction_old
-
-
+        self.fraction_delta = self.fraction - fraction_prev
+        # math.fabs() #/ self.fraction_old

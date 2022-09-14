@@ -13,26 +13,25 @@ class CellEnv(gym.Env):
 
     def __init__(self, packing, reset_callback=None, reward_callback=None,
                  observation_callback=None, done_callback=None,
-                 penalty_callback=None, mode:str="rotation"):
+                 penalty_callback=None):
 
         self.packing = packing
         self.agent = self.packing.cell
         self.dim = self.packing.dim
+
         # scenario callbacks
         self.reset_callback = reset_callback
         self.reward_callback = reward_callback
         self.observation_callback = observation_callback
         self.done_callback = done_callback
         self.penalty_callback = penalty_callback
-        # motion mode
-        self.mode = mode
-
+        
         # action space
-        if self.mode == "strain_tensor":
+        if self.agent.mode == "strain_tensor":
             # (symmetric) strain tensor controlling the deformation of cell
-            dim = self.dim*(self.dim+1)/2
+            dim = self.dim * (self.dim+1)/2
             self.action_space = spaces.Box(low=-1., high=1., shape=(6, ), dtype=np.float32)
-        elif self.mode == "rotation":
+        elif self.agent.mode == "rotation":
             # euler angles + cell length
             self.action_space = spaces.Box(low=-1., high=1., shape=(4*self.dim, ), dtype=np.float32)
 
@@ -53,7 +52,7 @@ class CellEnv(gym.Env):
         
         self._set_action(action)
         # advance cell state in a packing
-        self.packing.cell_step(self.mode)
+        self.packing.cell_step()
 
         # reward and observation
         obs = self.observation_callback(self.packing)
@@ -88,20 +87,20 @@ class CellEnv(gym.Env):
 
     def _set_action(self, action):
 
-        if self.mode == "strain_tensor":
+        if self.agent.mode == "strain_tensor":
             assert len(action) == 6
 
             strain = np.zeros((self.dim, self.dim))
             id = -1
             for i in range(self.dim):
                 for j in range(self.dim):
-                    if i>j: continue
+                    if (i < j): continue
                     id += 1
-                    strain[j][i] = strain[i][j] = action[id]
+                    strain[i][j] = strain[j][i] = action[id]
 
-            self.agent.action.strain = 1e-1 * strain
+            self.agent.action.strain = self.agent.strainMod * strain
             
-        elif self.mode == "rotation":
+        elif self.agent.mode == "rotation":
             assert len(action) == 12
 
             action = action.reshape(3, -1)
