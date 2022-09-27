@@ -2,12 +2,11 @@ import numpy as np
 import torch
 from torch.optim import Adam
 
-import gym
 import time
-import  core
+import core
 from utils.logx import EpochLogger
 from utils.mpi_pytorch import setup_pytorch_for_mpi, sync_params, mpi_avg_grads
-from utils.mpi_tools import mpi_fork, mpi_avg, proc_id, mpi_statistics_scalar, num_procs
+from utils.mpi_tools import mpi_avg, proc_id, mpi_statistics_scalar, num_procs
 from torch.nn.functional import softplus
 torch.autograd.set_detect_anomaly(True)
 
@@ -110,7 +109,6 @@ class PPOBuffer:
         data = dict(obs=self.obs_buf, act=self.act_buf, ret=self.ret_buf, cret=self.cret_buf,
                     adv=self.adv_buf, cadv=self.cadv_buf, logp=self.logp_buf)
         return {k: torch.as_tensor(v, dtype=torch.float32) for k,v in data.items()}
-
 
 
 def ppo(env_fn, actor_critic=core.MLPActorCritic, ac_kwargs=dict(), seed=0, 
@@ -330,8 +328,6 @@ def ppo(env_fn, actor_critic=core.MLPActorCritic, ac_kwargs=dict(), seed=0,
         train_v_iters=80
         for i in range(train_v_iters):
             
-            
-
             loss_v, loss_vc = compute_loss_v(data)
             vf_optimizer.zero_grad()
             loss_v.backward()
@@ -350,8 +346,7 @@ def ppo(env_fn, actor_critic=core.MLPActorCritic, ac_kwargs=dict(), seed=0,
                      DeltaLossPi=(loss_pi.item() - pi_l_old),
                      DeltaLossV=(loss_v.item() - v_l_old))
         
-
-
+        
     # Prepare for interaction with environment
     start_time = time.time()
     o, ep_ret,ep_cret, ep_len = env.reset(), 0, 0, 0
@@ -419,29 +414,3 @@ def ppo(env_fn, actor_critic=core.MLPActorCritic, ac_kwargs=dict(), seed=0,
         logger.log_tabular('StopIter', average_only=True)
         logger.log_tabular('Time', time.time()-start_time)
         logger.dump_tabular()
-
-if __name__ == '__main__':
-    import argparse
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--env', type=str, default='Cell-v0')
-    parser.add_argument('--hid', type=int, default=256)
-    parser.add_argument('--l', type=int, default=2)
-    parser.add_argument('--gamma', type=float, default=0.99)
-    parser.add_argument('--seed', '-s', type=int, default=0)
-    parser.add_argument('--cpu', type=int, default=4)
-    parser.add_argument('--steps', type=int, default=4000)
-    parser.add_argument('--epochs', type=int, default=50)
-    parser.add_argument('--exp_name', type=str, default='ppo')
-    args = parser.parse_args()
-
-    mpi_fork(args.cpu)  # run parallel code with mpi
-
-    from utils.run_utils import setup_logger_kwargs
-    logger_kwargs = setup_logger_kwargs(args.exp_name, args.seed)
-    num_steps = 1e7
-    steps_per_epoch = 30000
-    epochs = int(num_steps / steps_per_epoch)
-    ppo(lambda : gym.make(args.env), actor_critic=core.MLPActorCritic,
-        ac_kwargs=dict(hidden_sizes=[args.hid]*args.l), gamma=args.gamma, 
-        seed=args.seed, steps_per_epoch=steps_per_epoch, epochs=epochs,
-        logger_kwargs=logger_kwargs)

@@ -15,6 +15,9 @@ class Particle(object):
         # color
         self.color = None
 
+        # translational degree of freedom
+        self.tran = None
+
     def scaled_centroid(self, lattice):
         """
         Convert absolute centroid to the one in scaled coordinate frame.
@@ -48,6 +51,8 @@ class Particle(object):
 	
         self.state.centroid = np.matmul(lattice, scaled_pos.T).T
 
+    def random_orientation(self):
+        self.state.orientation = Transform().euler_random()
 
 class ParticleState(object):
     """
@@ -56,7 +61,6 @@ class ParticleState(object):
     def __init__(self):
         self.centroid = None
         # the z-y-x rotation convention (Tait-Bryan angles)
-        # (fai 0-2*PI; cita 0-PI; pesai 0-2*PI)
         self.orientation = None
 
 
@@ -96,7 +100,7 @@ class Sphere(Particle):
         """
         return 2.*self.radius
 
-# specific particles
+
 class Ellipsoid(Particle):
     def __init__(self):
         super().__init__()
@@ -105,6 +109,9 @@ class Ellipsoid(Particle):
         # shape parameters (alpha: alpha^beta : 1)
         self.alpha = None
         self.beta = None
+
+        # rotational degree of freedom
+        self.rot = None
 	
         # control action range
         self.tran_low = np.array([0., 0., 0.])
@@ -115,6 +122,10 @@ class Ellipsoid(Particle):
     
     @property
     def semi_axis(self):
+        """
+        Here we note some different notations:
+        # Donev: alpha: beta: 1 (beta=1)
+        """
         return np.array([self.alpha, self.alpha**self.beta, 1.])
 
     @property
@@ -153,9 +164,17 @@ class Ellipsoid(Particle):
 
         return matrix
 
+    @property
+    def grad(self) -> np.array:
+      grad_t = - self.tran
+      grad_r = - 2. * self.rot / self.outscribed_d
+
+      return np.concatenate([grad_t, grad_r], axis=0)
+
+
 
 class Cell(object):
-    def __init__(self, dim):
+    def __init__(self, dim, mode):
         self.dim = dim
         # origin of lattice (located in the origin by default)
         self.origin = None
@@ -168,6 +187,9 @@ class Cell(object):
         self.dv_prev = 1.
         self.performance = 1.
         self.trend = None
+
+        self.mode = mode
+        self.strainMod = 1e-2
 
         self.state = CellState()
         self.action = CellAction()
@@ -354,25 +376,21 @@ class Packing(object):
         return self.particles + copy_particles
 
     @property
-    def overlap_potential(self):
-        """
-        Calculate the external part of overlap potential for all overlaping pairs
-        """
+    def potential_energy(self, cal_force=False):
         image_list, extended_list = self.build_list()
 
-        # calculate penalty
         potential = 0.
         for a, particle_a in enumerate(self.particles):
             for b, particle_b in enumerate(self.particles):
                 # internal part (in the unit cell)
-                if (b > a): potential += overlap_fun(self.particle_type, particle_a, particle_b)
+                if (b > a): potential += overlap_fun(self.particle_type, particle_a, particle_b, cal_force)
 
                 if (b == a):
                     # external part I (with one's own periodic images)
                     for index in image_list:
                         vector = np.matmul(index, self.cell.state.lattice)
                         particle_i = particle_b.periodic_image(vector)
-                        potential += overlap_fun(self.particle_type, particle_a, particle_i)
+                        potential += overlap_fun(self.particle_type, particle_a, particle_i, cal_force)
                 else:
                     # external part II (with other particles’ periodic images)
                     # make sure that particle_b located in the origin
@@ -384,10 +402,10 @@ class Packing(object):
                         particle_i = particle_b.periodic_image(vector-particle_b.state.centroid)
                         distance = np.linalg.norm(particle_i.state.centroid - pa_new.state.centroid)
                         if distance < self.max_od:
-                            potential += overlap_fun(self.particle_type, pa_new, particle_i)
+                            potential += overlap_fun(self.particle_type, pa_new, particle_i, cal_force)
 
         return potential
-
+        
     @property  
     def is_overlap(self) -> bool:
         for i in range(3):
@@ -436,9 +454,34 @@ class Packing(object):
         else:
             # need further calculation
 	          # overlap potential is roughly less than 6 (empiricial)
-            penalty = self.overlap_potential / 6.
+            penalty = self.potential_energy / 6.
 	
         return penalty
+
+    def dilute_initialize(self):
+        relative_pos = []
+        for i in range(self.num_particles):
+          relative_pos.append(np.random.rand(self.dim))
+        
+        min_d = 4.*np.sqrt(3)
+        for a in range(self.num_particles):
+          for b in range(self.num_particles):
+            if a >= b: continue
+
+            for i in range(-1, 2):
+              for j in range(-1, 2):
+                for k in range(-1, 2): 
+                  pos = np.array([i, j, k], dtype=int)
+                  temp_d = np.linalg.norm(relative_pos[b] - relative_pos[a] - pos)
+                  min_d = min(min_d, temp_d)
+        
+        length = 1.001*self.max_od/min_d
+
+        for i, particle in enumerate(self.particles):
+          particle.state.centroid = length * relative_pos[i]
+          particle.random_orientation()
+        
+        self.cell.state.lattice = length * np.eye(self.dim)
 
     def build_list(self):
         """
@@ -464,9 +507,9 @@ class Packing(object):
 
         # add 1 layer of images in the positive vi directions to the set
         extended_list = image_list.copy()
-        for i in range(index_bound[0]+2):
-            for j in range(index_bound[1]+2):
-                for k in range(index_bound[2]+2):
+        for i in range(index_bound[0]+3):
+            for j in range(index_bound[1]+3):
+                for k in range(index_bound[2]+3):
                     if (i==j==k==0): continue
 
                     index = [i, j, k]
@@ -488,47 +531,24 @@ class Packing(object):
         
         self.cell.origin = origin / self.num_particles
 
-    def cell_step(self, mode):
+    def cell_step(self):
         """
         Update cell in the packing.
         """
         # store previous information
         self.cell.volume_prev = self.cell.volume
-        self.fraction_prev = self.fraction
+        fraction_prev = self.fraction
 
         # set action (small deformation)
-        if mode == "strain_tensor":
-            deformation = np.multiply(self.agent.state.base, self.agent.action.strain)
-            self.agent.state.base += deformation
-            self.agent.state.length = [np.linalg.norm(x) for x in self.agent.state.base]
-            self.agent.state.basis = [x / np.linalg.norm(x) for x in self.agent.state.base]
-            
-            self.agent.action.num += 1
+        if self.cell.mode == "strain_tensor":
+            deformation = np.multiply(self.cell.state.lattice, self.cell.action.strain)
+            self.cell.state.lattice += deformation
 
-        elif mode == "rotation":
-            for i in range(self.dim):
-                mat = Transform().euler2mat(self.cell.action.angle[i])
-                self.cell.state.lattice[i] = np.matmul(mat, self.cell.state.lattice[i])
+        elif self.cell.mode == "rotation":
+            self.cell.state.lattice = Transform().euler_rotate(
+                self.cell.action.angle, self.cell.state.lattice)
             self.cell.set_length(self.cell.action.length)
 
         self.cell.lattice_reduction()
-        for particle in self.particles:
-            particle.periodic_check(self.cell.state.lattice.T)
-
-        self.fraction_delta = math.fabs(self.fraction - self.fraction_prev) #/ self.fraction_old
-
-    # update state of the packing
-    def particle_step(self):
-        # set actions for the agent
-        self.agent.action = self.agent.action_callback(self)
-
-        # get information (lattice constant)
-        self.agent.length = self.get_length()
-
-        # update the packing fraction
-        fraction_old = self.fraction
-
-        self.fraction = self.volume_allp / self.agent.volume
-        self.fraction_delta = (self.fraction - fraction_old) / fraction_old
-
-
+        self.fraction_delta = self.fraction - fraction_prev
+        # math.fabs() #/ self.fraction_old

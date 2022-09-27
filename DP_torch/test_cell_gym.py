@@ -9,7 +9,7 @@ packing = scenario.build_packing()
 # Create environment
 
 env = CellEnv(packing, scenario.reset_packing, scenario.reward, scenario.observation, scenario.done)
-model = PPO.load("/mnt/Edisk/andrew/DensePacking-1/EliteDensePacker/ppo_densepacking-v18.5.zip")
+model = PPO.load("/mnt/Edisk/andrew/DensePacking-1/DP_torch/a.zip")
 # version 5 is the 17:52 17th Aug, last version.
 
 info_list = []
@@ -22,4 +22,4 @@ for i in tqdm(range(int(1e5))):
     if done:
         env.reset()
  
-pd.DataFrame(info_list).to_csv("/mnt/Edisk/andrew/DensePacking-1/outcomes/analysis_test_cell_gym-v18.5.csv")
+pd.DataFrame(info_list).to_csv("/mnt/Edisk/andrew/DensePacking-1/outcomes/analysis_test_cell_gym-v18.6.csv")
